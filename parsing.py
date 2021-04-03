@@ -10,16 +10,47 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+from typing import Union
+
 from abs import EmptyExpr, Statement, Expr
 from datatypes import Bool, Name, Num, String
 from operators import BinOp, BoolOp
 from statements import Assign
-from exceptions import RamSyntaxException, RamSyntaxKeywordException
-
+from exceptions import RamSyntaxException, RamSyntaxKeywordException, \
+    RamSyntaxOperatorException
 
 # Globals
 VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
+
+
+def pedmas(sequence: list[str]) -> list[Union[str, list]]:
+    """Add brackets to add order to the operations.
+       No recursion needed here as sequence is just a list of strings.
+
+       >>> pedmas(['5', '*', '3', '-', '2', '/', '4'])
+       [['5', '*', '3'], '-', ['2', '/', '4']]
+       >>> pedmas(['4', '+', '2', '*', '7', '-', '1'])
+       ['4', '+', ['2', '*', '7'], '-', '1']
+    """
+    # TODO: implement this function
+
+
+def lexify(line: str) -> list[Union[str, list]]:
+    """Return a list of the line split.
+       Works exactly like str.split but considers parantheses through
+       recursion.
+
+       >>> lexify('')
+       []
+       >>> lexify('Hello World!')
+       ['Hello', 'World!']
+       >>> lexify('5 + (9 * 2) - 3')
+       ['5', '+', ['9', '*', '2'], '-', '3']
+       >>> lexify('14 - (2 + (7 / (4 + 1) - 15) + (3 * 4))')
+       ['14', '-', ['2', '+', ['7', '/', ['4', '+', '1'], '-', '15'], '+', ['3', '*', '4']]]
+    """
+    # TODO: implement this function
 
 
 class Block:
@@ -43,6 +74,7 @@ class Line:
 
     def __init__(self, line: str, number: int) -> None:
         self.line = line
+        # self.strs = lexify(line)
         self.strs = line.split()
         self.number = number
 
@@ -51,10 +83,10 @@ class Line:
 
     def parse(self) -> Statement:
         """Parse a line of Ram code
-        >>> l = Line('set integer var1 to 10', 10)
+        >>> l = Line('set integer var1 to 10 + 5', 8)
         >>> statement = l.parse()
         >>> str(statement)
-        'var1 = 10'
+        'var1 = 15'
         """
         keyword = self.strs[0]
 
@@ -62,6 +94,7 @@ class Line:
             # variable assignment
             var_type = self.strs[1]
             if var_type in VAR_TYPES:
+                #
                 return parse_variable(self.line, self.number, var_type, self.strs[2:])
             else:
                 raise RamSyntaxKeywordException(self.line, self.number, var_type)
@@ -80,7 +113,7 @@ def parse_variable(line: str, number: int, var_type, to_assign: list[str]) -> As
     Precondition:
      - var_type in VAR_TYPES
 
-    >>> parse_variable('integer', ['var1', 'to', '10 + 5'])
+    >>> parse_variable('', 0, 'integer', ['var1', 'to', ['10', '+', '5']])
     """
     if len(to_assign) < 3:
         raise RamSyntaxException(line, number)
@@ -99,15 +132,20 @@ def parse_variable(line: str, number: int, var_type, to_assign: list[str]) -> As
 def parse_integer_assign(line: str, number: int, name: str, value: list[str]) -> Assign:
     """ Parse an integer assignment statement."""
     value_expr = parse_expression(line, number, value)
-
     env = {}  # TODO: add environment variable env
-    result = value_expr.evaluate(env)
 
-    if isinstance(result, float):
-        return Assign(name, Num(result))
+    try:
+        result = value_expr.evaluate(env)
+    except Exception as e:
+        print("---------------------------------ERROR---------------------------------")
+        print(e)
+        print("---------------------------------ERROR---------------------------------")
     else:
-        raise RamSyntaxException(
-            line, number, f'Expression \'{str(value_expr)}\' must evaluate to a number.')
+        if isinstance(result, float):
+            return Assign(name, Num(result))
+        else:
+            raise RamSyntaxException(
+                line, number, f'Expression \'{str(value_expr)}\' must evaluate to a number.')
 
 
 def parse_string_assign(line: str, number: int, name: str, value: list[str]) -> Assign:
@@ -124,42 +162,49 @@ def parse_string_assign(line: str, number: int, name: str, value: list[str]) -> 
             line, number, f'Expression \'{str(value_expr)}\' must evaluate to an integer.')
 
 
-def parse_expression(line: str, number: int, values: list[str]) -> Expr:
+def parse_expression(line: str, number: int, values: list) -> Expr:
     """
     Recursively parse an expression.
+    For expressions involving binary operations (BinOp), values must
+    account for the order of operations using nested lists as follows:
+
+    '5 - 4 * 3 / 2' corresponds to values = ['5', '-', [['4', '*', '3'], '/', '2']]
+
+    Otherwise, values = ['5', '-', '4', '*', '3', '/', '2'] will be interpreted as:
+    5 - (4 * (3 / 2))
 
     >>> parse_expression('', 0, ['5', '+', '6', '-', '2']).evaluate({})
-    '9'
+    9
     >>> parse_expression('', 0, ['x', 'or', 'true']).evaluate({'x': False})
-    'True'
+    True
+    >>> exp = parse_expression('', 0, ['5', '+', [['6', '-', '2'], '+', '3']])
+    >>> str(exp)
+    '(5.0 + ((6.0 - 2.0) + 3.0))'
+    >>> exp.evaluate({})
+    12.0
     """
     expression_so_far = EmptyExpr()
     env = {}  # TODO: implement env?
+    proceed = verify_keywords(values)
 
-    if values == []:
+    if proceed is not True:
+        raise RamSyntaxOperatorException(line, number, proceed)
+    elif values == []:
         # Base case: values is empty
         return expression_so_far
     elif len(values) == 1:
         # Looking at a single value
-        val = values[0]
-        if val.isdigit():
-            expression_so_far = Num(float(val))
-        elif val == 'true':
-            expression_so_far = Bool(True)
-        elif val == 'false':
-            expression_so_far = Bool(False)
+        if isinstance(values[0], list):
+            expression_so_far = parse_expression(line, number, values[0])
         else:
-            expression_so_far = Name(val)
+            expression_so_far = get_expression_single_value(values[0])
     else:
-        # prepare for operator
-        val, next_val = values[0], values[1]
+        val, next_val = values[0], values[1]  # prepare for operator
 
         if expression_so_far.evaluate(env) is None and val in OPERATORS:
             raise RamSyntaxException(line, number)
-        elif next_val in {'+', '*', '-', '/'}:
+        elif next_val in {'*', '/', '+', '-'}:
             # currently groups rest of operation together recursively
-            # for example, ['5', '*', '6', '+', '2', '+', '1'] would
-            # translate to (5.0 * (6.0 + (2.0 + 1.0)))
             expression_so_far = BinOp(
                 parse_expression(line, number, values[0:1]), next_val,
                 parse_expression(line, number, values[2:]))
@@ -167,6 +212,50 @@ def parse_expression(line: str, number: int, values: list[str]) -> Expr:
             expression_so_far = BoolOp(
                 val, [parse_expression(line, number, values[0:1]),
                       parse_expression(line, number, values[2:])])
+        else:
+            raise RamSyntaxException(line, number)
 
     # return final expression
     return expression_so_far
+
+
+def verify_keywords(values: list[Union[str, list]]) -> Union[bool, str]:
+    """ Verify that every other item in values is a recognized
+        operator in OPERATORS. """
+    for i in range(len(values)):
+        if i % 2 == 1 and values[i] not in OPERATORS:
+            return values[i]
+
+    return True
+
+
+def verify_keywords_recurse(values: list[Union[str, list]]) -> Union[bool, str]:
+    """ Verify that every other item in values is a recognized
+        operator in OPERATORS recursively.
+
+        Equivalent to the following, except returns source if False:
+        all(values[i] in OPERATORS for i in range(len(values)) if i % 2 == 1)
+
+        >>> verify_keywords_recurse(['x', '-', [['8', '/', '2'], '+', '1'], '-', ['4', '*', '3']])
+        True
+    """
+    if isinstance(values, str):
+        return True
+    else:
+        for i in range(len(values)):
+            if i % 2 == 1 and values[i] not in OPERATORS:
+                return values[i]
+            elif i % 2 == 0 and isinstance(values[i], list):
+                return verify_keywords_recurse(values[i])
+
+        return True
+
+
+def get_expression_single_value(value: str) -> Expr:
+    """ Get the expression that represents a single value. """
+    if value.isdigit():
+        return Num(float(value))
+    elif value == 'true' or value == 'false':
+        return Bool(value == 'true')
+    else:
+        return Name(value)

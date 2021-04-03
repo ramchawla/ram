@@ -31,3 +31,16 @@ class RamSyntaxKeywordException(RamSyntaxException):
     """Keyword Syntax Exception."""
     def __init__(self, line: str, line_number: int, foreign: str) -> None:
         RamSyntaxException.__init__(self, line, line_number, f'Keyword \'{foreign}\' invalid.')
+
+
+class RamSyntaxOperatorException(RamSyntaxException):
+    """Keyword Syntax Exception."""
+
+    def __init__(self, line: str, line_number: int, foreign: str) -> None:
+        RamSyntaxException.__init__(self, line, line_number, f'Operator \'{foreign}\' invalid.')
+
+
+class RamNameException(RamException):
+    """ Undefined variable exception. """
+    def __init__(self, line: str, line_number: int, foreign: str) -> None:
+        RamException.__init__(self, line, line_number, f'Variable \'{foreign}\' not defined.')
