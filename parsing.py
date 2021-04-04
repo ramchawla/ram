@@ -12,11 +12,11 @@ Ariel Chouminov, Ramya Chawla.
 """
 from typing import Union
 
-from abs import EmptyExpr, Statement, Expr
-from datatypes import Bool, Name, Num, String
-from operators import BinOp, BoolOp
-from statements import Assign
-from exceptions import RamSyntaxException, RamSyntaxKeywordException, \
+from syntaxtrees.abs import EmptyExpr, Statement, Expr
+from syntaxtrees.datatypes import Bool, Name, Num, String
+from syntaxtrees.operators import BinOp, BoolOp
+from syntaxtrees.statements import Assign, Display
+from exceptions import RamException, RamSyntaxException, RamSyntaxKeywordException, \
     RamSyntaxOperatorException
 
 # Globals
@@ -90,22 +90,16 @@ class Line:
 
         if keyword == 'set':
             # variable assignment
-            var_type = self.strs[1]
-            if var_type in VAR_TYPES:
-                #
-                return parse_variable(self.line, self.number, var_type, self.strs[2:])
-            else:
-                raise RamSyntaxKeywordException(self.line, self.number, var_type)
+            return parse_variable(self.line, self.number, self.strs[1], self.strs[2:])
         elif keyword == 'display':
             # print statement
-            # TODO: implement this branch
-            ...
+            return parse_display(self.line, self.number, self.strs[1:2])
         else:
             # keyword not recognized
             raise RamSyntaxKeywordException(self.line, self.number, keyword)
 
 
-def parse_variable(line: str, number: int, var_type, to_assign: list[str]) -> Assign:
+def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) -> Assign:
     """ Parse a variable assignment statement.
 
     Precondition:
@@ -113,7 +107,9 @@ def parse_variable(line: str, number: int, var_type, to_assign: list[str]) -> As
 
     >>> parse_variable('', 0, 'integer', ['var1', 'to', ['10', '+', '5']])
     """
-    if len(to_assign) < 3:
+    if var_type not in VAR_TYPES:
+        raise RamSyntaxKeywordException(line, number, var_type)
+    elif len(to_assign) < 3:
         raise RamSyntaxException(line, number)
     elif to_assign[1] != 'to':
         raise RamSyntaxKeywordException(line, number, to_assign[1])
@@ -127,6 +123,22 @@ def parse_variable(line: str, number: int, var_type, to_assign: list[str]) -> As
         raise ValueError(f'Unknown variable type \'{var_type}\'.')
 
 
+def parse_display(line: str, number: int, value: list[str]) -> Statement:
+    """ Parse a display assignment statement. """
+    value_expr = parse_expression(line, number, value)
+    env = {}  # TODO: add environment variable env
+
+    try:
+        result = value_expr.evaluate(env)
+    except Exception as e:
+        # TODO: implement error handling here.
+        # An error may be raised if the expression cannot be
+        # evaluated. This should be because of a Ram user's mistake.
+        raise RamException(line, number, f'Error {e} was raised.')
+    else:
+        return Display(result)
+
+
 def parse_integer_assign(line: str, number: int, name: str, value: list[str]) -> Assign:
     """ Parse an integer assignment statement."""
     value_expr = parse_expression(line, number, value)
@@ -135,9 +147,10 @@ def parse_integer_assign(line: str, number: int, name: str, value: list[str]) ->
     try:
         result = value_expr.evaluate(env)
     except Exception as e:
-        print("---------------------------------ERROR---------------------------------")
-        print(e)
-        print("---------------------------------ERROR---------------------------------")
+        # TODO: implement error handling here.
+        # An error may be raised if the expression cannot be
+        # evaluated. This should be because of a Ram user's mistake.
+        raise RamException(line, number, f'Error {e} was raised.')
     else:
         if isinstance(result, float):
             return Assign(name, Num(result))
@@ -150,8 +163,8 @@ def parse_string_assign(line: str, number: int, name: str, value: list[str]) -> 
     """ Parse a string assignment statement. """
     value_expr = parse_expression(line, number, value)
 
-    # TODO: add environment variable env
-    result = value_expr.evaluate({})
+    env = {}  # TODO: add environment variable env
+    result = value_expr.evaluate(env)
 
     if isinstance(result, str):
         return Assign(name, String(result))
@@ -182,7 +195,9 @@ def parse_expression(line: str, number: int, values: list) -> Expr:
     12.0
     """
     expression_so_far = EmptyExpr()
-    env = {}  # TODO: implement env?
+    env = {}  # TODO: add environment variable env
+
+    # verify that every other value is a recognized operator
     proceed = verify_keywords(values)
 
     if proceed is not True:
@@ -225,28 +240,6 @@ def verify_keywords(values: list[Union[str, list]]) -> Union[bool, str]:
             return values[i]
 
     return True
-
-
-def verify_keywords_recurse(values: list[Union[str, list]]) -> Union[bool, str]:
-    """ Verify that every other item in values is a recognized
-        operator in OPERATORS recursively.
-
-        Equivalent to the following, except returns source if False:
-        all(values[i] in OPERATORS for i in range(len(values)) if i % 2 == 1)
-
-        >>> verify_keywords_recurse(['x', '-', [['8', '/', '2'], '+', '1'], '-', ['4', '*', '3']])
-        True
-    """
-    if isinstance(values, str):
-        return True
-    else:
-        for i in range(len(values)):
-            if i % 2 == 1 and values[i] not in OPERATORS:
-                return values[i]
-            elif i % 2 == 0 and isinstance(values[i], list):
-                return verify_keywords_recurse(values[i])
-
-        return True
 
 
 def get_expression_single_value(value: str) -> Expr:

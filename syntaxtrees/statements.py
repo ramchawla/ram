@@ -49,7 +49,7 @@ class Assign(Statement):
         return self.target + ' = ' + str(self.value)
 
 
-class Print(Statement):
+class Display(Statement):
     """A statement representing a call to the `print` function.
 
     Instance Attributes:
@@ -92,13 +92,13 @@ class If(Statement):
     >>> from operators import BinOp
     >>> If(
     ...    Compare(Name('x'), [('<', Num(100))]),
-    ...    [Print(Name('x'))],
+    ...    [Display(Name('x'))],
     ...    [Assign('y', BinOp(Name('x'), '+', Num(2))),
     ...     Assign('x', Num(1))]
     ... )
     >>> If(
     ...    Compare(Name('x'), [('<', Num(100))]),
-    ...    [Print(Name('x'))],
+    ...    [Display(Name('x'))],
     ...    []
     ... )
     """
@@ -160,7 +160,7 @@ class ForRange(Statement):
     ...     Assign('sum_so_far', Num(0)),
     ...     ForRange('n', Num(1), Num(10),
     ...              [assign]),
-    ...     Print(Name('sum_so_far'))
+    ...     Display(Name('sum_so_far'))
     ... ])
     """
     target: str
@@ -181,7 +181,7 @@ class ForRange(Statement):
         >>> from datatypes import Num, Name
         >>> from operators import BinOp
         >>> statement = ForRange('x', Num(1), BinOp(Num(2), '+', Num(3)),
-        ...                      [Print(Name('x'))])
+        ...                      [Display(Name('x'))])
         >>> statement.evaluate({})
         1
         2
