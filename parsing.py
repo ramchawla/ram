@@ -26,7 +26,6 @@ OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
 
 def pedmas(sequence: list[str]) -> list[Union[str, list]]:
     """Add brackets to add order to the operations.
-       No recursion needed here as sequence is just a list of strings.
 
        >>> pedmas(['5', '*', '3', '-', '2', '/', '4'])
        [['5', '*', '3'], '-', ['2', '/', '4']]
@@ -38,8 +37,7 @@ def pedmas(sequence: list[str]) -> list[Union[str, list]]:
 
 def lexify(line: str) -> list[Union[str, list]]:
     """Return a list of the line split.
-       Works exactly like str.split but considers parantheses through
-       recursion.
+       Works exactly like str.split but considers parantheses with nesting.
 
        >>> lexify('')
        []
