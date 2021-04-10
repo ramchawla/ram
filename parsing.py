@@ -24,16 +24,50 @@ VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
 
 
+
 def pedmas(sequence: list[str]) -> list[Union[str, list]]:
     """Add brackets to add order to the operations.
+
+    Precondition:
+        - no empty list inside sequence
+        - no operator as the first or last element
 
        >>> pedmas(['5', '*', '3', '-', '2', '/', '4'])
        [['5', '*', '3'], '-', ['2', '/', '4']]
        >>> pedmas(['4', '+', '2', '*', '7', '-', '1'])
        ['4', '+', ['2', '*', '7'], '-', '1']
     """
-    # TODO: implement this function
-    ...
+    d = 0
+
+    for item in sequence:
+        if item == '*' or item == '/':
+            d += 1
+
+    equation = pedmas_helper(sequence, d)
+
+    return equation
+
+
+def pedmas_helper(sequence: list[str], d: int):
+    """helper function for pedmas function"""
+    if d == 0:
+        return sequence
+
+    new_list = []
+
+    for index in range(len(sequence) - 1):
+        if sequence[index + 1] == '*' or sequence[index + 1] == '/':
+            lst = [sequence[index], sequence[index + 1], sequence[index + 2]]
+
+            new_list.append(lst)
+            new_list.extend(sequence[index + 3:])
+
+            d = d - 1
+            return pedmas_helper(new_list, d)
+        else:
+            new_list.append(sequence[index])
+
+    return sequence
 
 
 def lexify(line: str) -> list[Union[str, list]]:
@@ -49,9 +83,19 @@ def lexify(line: str) -> list[Union[str, list]]:
        >>> lexify('14 - (2 + (7 / (4 + 1) - 15) + (3 * 4))')
        ['14', '-', ['2', '+', ['7', '/', ['4', '+', '1'], '-', '15'], '+', ['3', '*', '4']]]
     """
-    # TODO: implement this function
-    ...
+    dict = {'(': [], ')': []}
 
+    # Populate the lists
+    for index in range(len(line)):
+        if line[index] == '(':
+            dict['('].append(index)
+        elif line[index] == ')':
+            dict[')'].append(index)
+
+    # combine the lists
+    lst = sorted(dict['('] + dict[')'])
+
+    return lst
 
 class Line:
     """ A line of Ram code to parse. """
