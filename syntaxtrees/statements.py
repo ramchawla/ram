@@ -10,7 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from abs import EmptyExpr, Expr, Statement
+from abs import Expr, Statement
 from typing import Any
 
 
@@ -194,30 +194,37 @@ class Loop(Statement):
 
         # 2. Execute the body once for each number between start and stop - 1
         for i in range(start_val, stop_val):
-            # Need to "assign" self.target to i in the variable environment env
-            # Version 1
+            # assign self.target to i in the variable environment env
             env[self.target] = i
-
-            # Version 2
-            # assign = Assign(self.target, Num(i))
-            # assign.evaluate(env)
 
             for statement in self.body:
                 statement.evaluate(env)
 
 
 class Function(Statement):
-    """ A function that takes in parameters with no return.
+    """ A function that takes in parameters and returns rturn.
+        Note: rturn must be at end of function call.
 
+    If we wanted to represent the following function:
+    def f(x: int, y: int) -> int:
+        z = x + y
+        return z
+
+    We would create in instance of Function as follows:
     >>> from datatypes import Name, String
     >>> from operators import BinOp
-    >>> f = Function(['x', 'y'], [Display(BinOp(Name('x'), '+' ,Name('y'))), Display(String('Hello'))], EmptyExpr())
+    >>> f = Function('f', ['x', 'y'],
+    >>> ... [Assign('z', BinOp(Name('x'), '+', Name('y')))], Name('z'))
+    >>> f.evaluate({'x': 10, 'y': 5})
+    15
     """
+    name: str
     params: list[str]
     body: list[Statement]
     rturn: Expr
 
-    def __init__(self, params: list[str], body: list[Statement], rturn: Expr) -> None:
+    def __init__(self, name: str, params: list[str], body: list[Statement], rturn: Expr) -> None:
+        self.name = name
         self.params = params
         self.body = body
         self.rturn = rturn

@@ -15,7 +15,7 @@ from typing import Any, Union
 from syntaxtrees.abs import EmptyExpr, Statement, Expr
 from syntaxtrees.datatypes import Bool, Name, Num, String
 from syntaxtrees.operators import BinOp, BoolOp
-from syntaxtrees.statements import Assign, Display, Loop
+from syntaxtrees.statements import Assign, Display, Function, Loop
 from exceptions import RamException, RamSyntaxException, RamSyntaxKeywordException, \
     RamSyntaxOperatorException
 
@@ -125,14 +125,14 @@ class Block:
         if self.keyword == 'loop':
             return parse_loop(self.header, self.header.split(), self.body, env)
         elif self.keyword == 'new':
-            ...
+            return parse_function(self.header, self.header.split(), self.body, env)
         else:
             ...
 
 
 def parse_loop(header_line: str, header_list: list[Union[str, list]],
-               body: list[Line], env: dict[str, Any]) -> Loop:
-    """Parse a loop block into a loop statement.
+               body: list[Union[Line, Block]], env: dict[str, Any]) -> Loop:
+    """Parse a loop block into a Loop statement.
     If we wanted the following to be returned:
     >>> Loop('x', Num(1), BinOp(Num(2), '+', Num(3)),
         ... [Display(BinOp(Name('x'), '*', Num(2)))])
@@ -163,6 +163,53 @@ def parse_loop(header_line: str, header_list: list[Union[str, list]],
     raise RamSyntaxException(
         header_line, line_number,
         f'Expression \'{str(start)}\' and \'{str(stop)}\' must both evaluate to numbers.')
+
+
+def parse_function(header_line: str, header_list: list[Union[str, list]],
+               body: list[Line], rturn: str, env: dict[str, Any]) -> Function:
+    """ Parse a function into a Function statement.
+        If we wanted the following to be returned:
+        >>> Function('f', ['x', 'y'],
+        >>> ... [Assign('z', BinOp(Name('x'), '+', Name('y')))], Name('z'))
+
+        We would have to call parse_function this way:
+        >>> f = parse_function('new function f takes (x,y)',
+        ... ['new', 'function', 'f', 'takes', '(x,y)',  ['2', '+', '3']],
+        ... [Line('set integer z to x + y', 2)], 'send back z', {})
+        >>> f.evaluate({'x': 10, 'y': 5})
+        15
+    """
+    body_statements = [b.parse(env) for b in body]
+    line_number = body[0].number - 1
+
+    if len(header_list) != 6:
+        raise RamSyntaxException(header_line, line_number, 'Loop header cannot be parsed.')
+    elif header_list[1] != 'function':
+        raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
+    elif header_list[3] != 'takes':
+        raise RamSyntaxKeywordException(header_line, line_number, header_list[3])
+    else:
+        param_names = header_list[4].replace(' ', '').replace(
+            '(', '').replace(')', '').split(',')
+        function_name = header_list[2]
+        rturn_expr = parse_return(rturn, body[-1].number + 1, rturn.split())
+        func = Function(function_name, param_names, body_statements, rturn_expr)
+
+        # TODO: add function to environment somehow?
+        env[function_name] = func
+        return func
+
+
+def parse_return(line: str, line_number: int, return_list: list[str]) -> Expr:
+    """ Parse a return statement. """
+    if len(return_list) != 3:
+        raise RamSyntaxException(line, line_number, 'Return statement not parseable.')
+    elif return_list[0] != 'send':
+        raise RamSyntaxKeywordException(line, line_number, return_list[0])
+    elif return_list[1] != 'back':
+        raise RamSyntaxKeywordException(line, line_number, return_list[1])
+    else:
+        return parse_expression(line, line_number, return_list[2:], {})
 
 
 def parse_variable(line: str, number: int, var_type: str,
@@ -204,19 +251,23 @@ def parse_integer_assign(line: str, number: int, name: str, value: list[str],
     """ Parse an integer assignment statement."""
     value_expr = parse_expression(line, number, value, env)
 
-    try:
-        result = value_expr.evaluate(env)
-    except Exception as e:
-        # TODO: implement error handling here.
-        # An error may be raised if the expression cannot be
-        # evaluated. This should be because of a Ram user's mistake.
-        raise RamException(line, number, f'Error {e} was raised.')
+    # try:
+    #     result = value_expr.evaluate(env)
+    # except Exception as e:
+    #     # TODO: implement error handling here.
+    #     # An error may be raised if the expression cannot be
+    #     # evaluated. This should be because of a Ram user's mistake.
+    #     print(e)
+    #     raise RamException(line, number, f'Error was raised.')
+    if False:  # temporary
+        ...  # temporary
     else:
-        if isinstance(result, float):
-            return Assign(name, Num(result))
-        else:
-            raise RamSyntaxException(
-                line, number, f'Expression \'{str(value_expr)}\' must evaluate to a number.')
+        return Assign(name, value_expr)
+        # if isinstance(result, float):
+        #     return Assign(name, Num(result))
+        # else:
+        #     raise RamSyntaxException(
+        #        line, number, f'Expression \'{str(value_expr)}\' must evaluate to a number.')
 
 
 def parse_string_assign(line: str, number: int, name: str,
