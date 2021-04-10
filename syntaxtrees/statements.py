@@ -10,7 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from abs import Expr, Statement
+from abs import EmptyExpr, Expr, Statement
 from typing import Any
 
 
@@ -204,3 +204,29 @@ class Loop(Statement):
 
             for statement in self.body:
                 statement.evaluate(env)
+
+
+class Function(Statement):
+    """ A function that takes in parameters with no return.
+
+    >>> from datatypes import Name, String
+    >>> from operators import BinOp
+    >>> f = Function(['x', 'y'], [Display(BinOp(Name('x'), '+' ,Name('y'))), Display(String('Hello'))], EmptyExpr())
+    """
+    params: list[str]
+    body: list[Statement]
+    rturn: Expr
+
+    def __init__(self, params: list[str], body: list[Statement], rturn: Expr) -> None:
+        self.params = params
+        self.body = body
+        self.rturn = rturn
+
+    def evaluate(self, env: dict[str, Any]) -> Expr:
+        """ Precondition:
+             - all(var in env for var in self.params)
+        """
+        for statement in self.body:
+            statement.evaluate(env)
+
+        return self.rturn.evaluate(env)
