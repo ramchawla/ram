@@ -140,3 +140,6 @@ class Name(Expr):
             return env[self.id]
         else:
             raise NameError
+
+    def __str__(self) -> str:
+        return self.id

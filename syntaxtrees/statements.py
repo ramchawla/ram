@@ -138,7 +138,7 @@ class If(Statement):
             statement.evaluate(env)
 
 
-class ForRange(Statement):
+class Loop(Statement):
     """A for loop that loops over a range of numbers.
 
         for <target> in range(<start>, <stop>):
@@ -158,7 +158,7 @@ class ForRange(Statement):
     >>> assign = Assign('sum_so_far', BinOp(Name('sum_so_far'), '+', Name('n')))
     >>> Module([
     ...     Assign('sum_so_far', Num(0)),
-    ...     ForRange('n', Num(1), Num(10),
+    ...     Loop('n', Num(1), Num(10),
     ...              [assign]),
     ...     Display(Name('sum_so_far'))
     ... ])
@@ -180,7 +180,7 @@ class ForRange(Statement):
         """Evaluate this statement.
         >>> from datatypes import Num, Name
         >>> from operators import BinOp
-        >>> statement = ForRange('x', Num(1), BinOp(Num(2), '+', Num(3)),
+        >>> statement = Loop('x', Num(1), BinOp(Num(2), '+', Num(3)),
         ...                      [Display(Name('x'))])
         >>> statement.evaluate({})
         1
