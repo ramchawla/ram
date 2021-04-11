@@ -10,7 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from syntaxtrees.abs import EmptyExpr, Statement, Expr
 from syntaxtrees.datatypes import Bool, Name, Num, String
@@ -22,7 +22,6 @@ from exceptions import RamException, RamSyntaxException, RamSyntaxKeywordExcepti
 # Globals
 VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
-
 
 
 def pedmas(sequence: list[str]) -> list[Union[str, list]]:
@@ -44,7 +43,6 @@ def pedmas(sequence: list[str]) -> list[Union[str, list]]:
             d += 1
 
     equation = pedmas_helper(sequence, d)
-
     return equation
 
 
@@ -83,19 +81,94 @@ def lexify(line: str) -> list[Union[str, list]]:
        >>> lexify('14 - (2 + (7 / (4 + 1) - 15) + (3 * 4))')
        ['14', '-', ['2', '+', ['7', '/', ['4', '+', '1'], '-', '15'], '+', ['3', '*', '4']]]
     """
-    dict = {'(': [], ')': []}
+    blocks = identify_bracket_blocks(line)
+    lexed_so_far = []
 
-    # Populate the lists
-    for index in range(len(line)):
-        if line[index] == '(':
-            dict['('].append(index)
-        elif line[index] == ')':
-            dict[')'].append(index)
+    for block in blocks:
+        if isinstance(block, list):
+            lexed_so_far += [lexify(block[0])]
+        else:
+            assert isinstance(block, str)
+            to_add = block.split()
 
-    # combine the lists
-    lst = sorted(dict['('] + dict[')'])
+            if len(to_add) < 3:
+                end_index = 0
+            else:
+                end_index = 1 + 2 * ((len(to_add) - 1) // 2)
 
-    return lst
+            lexed_so_far.extend(pedmas(to_add[:end_index]) + to_add[end_index:])
+
+    return lexed_so_far
+
+
+def format_whitespace(text: str) -> str:
+    """ Insert whitespace around operators.
+
+    >>> format_whitespace('(7/(4 +1)- 15)')
+    '(7 / (4 + 1) - 15)'
+    """
+    new_text = ''
+
+    for char in text.replace(' ', ''):
+        if char in OPERATORS:
+            new_text += f' {char} '
+        else:
+            new_text += char
+
+    return new_text
+
+
+def identify_bracket_blocks(text: str) -> list[str]:
+    """Return the index of the first bracket and the index
+       of the last bracket in the form of a tuple.
+
+       Precondition:
+        - whitespace around operators as described by insert_whitespace.
+
+    >>> identify_bracket_blocks('1 + (2 + 3)')
+    ['1 + ', '(2 + 3)']
+    >>> identify_bracket_blocks('2 + 3 + (4 - ((6 / 3) + 1))')
+    ['2 + 3 + ', '4 - ((6 / 3) + 1)']
+    >>> identify_bracket_blocks('2 + (7 / (4 + 1) - 15) + (3 * 4)')
+    ['2 + ', '7 / (4 + 1) - 15', ' + ', '3 * 4']
+    """
+    count, start = 0, -1
+    indices = []
+
+    for i in range(len(text)):
+        if text[i] == '(':
+            if count == 0:
+                start = i
+            count += 1
+        elif text[i] == ')':
+            count -= 1
+            if count == 0:
+                indices.append((start, i))
+
+    if indices == []:
+        return [text] if text != '' else []
+
+    bracket_blocks = [text[:indices[0][0]]]
+
+    for j in range(len(indices)):
+        index_pair = indices[j]
+        bracket_blocks.append([text[index_pair[0] + 1: index_pair[1]]])
+        if j < len(indices) - 1:
+            bracket_blocks.append(text[index_pair[1] + 1: indices[j + 1][0]])
+
+    bracket_blocks.append(text[indices[len(indices) - 1][1] + 1:])
+    return bracket_blocks if bracket_blocks != [''] else []
+
+
+def get_line_as_list(line: str) -> list[str]:
+    """ Get a line as a list of strings.
+
+    >>> get_line_as_list('set integer var1 to 10 + 5')
+    """
+    line_so_far = line.split()[:4]
+    line_so_far += [lexify(' '.join(line.split()[4:]))]
+    return line_so_far
+
 
 class Line:
     """ A line of Ram code to parse. """
@@ -106,8 +179,7 @@ class Line:
 
     def __init__(self, line: str, number: int) -> None:
         self.line = line
-        # self.strs = lexify(line)
-        self.strs = line.split()
+        self.strs = get_line_as_list(line)
         self.number = number
 
         if len(self.strs) < 2:
@@ -122,7 +194,7 @@ class Line:
         >>> l = Line('set integer var1 to 10 + 5', 8)
         >>> statement_one = l.parse({})
         >>> str(statement_one)
-        'var1 = 15'
+        'var1 = (10.0 + 5.0)'
         >>> l = Line('display var1', 2)
         >>> statement_two = l.parse({'var1': 15})
         >>> statement_two.evaluate({'var1': 15})
