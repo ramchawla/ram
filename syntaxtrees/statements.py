@@ -189,8 +189,8 @@ class Loop(Statement):
         4
         """
         # 1. Evaluate start and stop
-        start_val = self.start.evaluate(env)
-        stop_val = self.stop.evaluate(env)
+        start_val = int(self.start.evaluate(env))
+        stop_val = int(self.stop.evaluate(env))
 
         # 2. Execute the body once for each number between start and stop - 1
         for i in range(start_val, stop_val):
