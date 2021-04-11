@@ -154,6 +154,12 @@ class Block:
             ...
 
 
+class Program:
+    """ A Ram Program. """
+    # TODO: implement
+    ...
+
+
 def parse_loop(header_line: str, header_list: list[Union[str, list]],
                body: list[Union[Line, Block]]) -> Loop:
     """Parse a loop block into a Loop statement.
