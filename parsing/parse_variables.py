@@ -24,8 +24,7 @@ VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
 
 
-def parse_variable(line: str, number: int, var_type: str,
-                   to_assign: list[str]) -> Assign:
+def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) -> Assign:
     """ Parse a variable assignment statement.
 
     Precondition:
@@ -41,8 +40,8 @@ def parse_variable(line: str, number: int, var_type: str,
         raise RamSyntaxKeywordException(line, number, to_assign[1])
 
     if var_type == 'integer' or var_type == 'text':
-        return parse_assign(line, number,
-                            to_assign[0], to_assign[2:])
+        # parse an integer or string assignment statement
+        return parse_assign(line, number, to_assign[0], to_assign[2:])
     else:
         # should not reach this branch because of precondition
         raise ValueError(f'Unknown variable type \'{var_type}\'.')
@@ -75,21 +74,23 @@ def parse_expression(line: str, number: int, values: list) -> Expr:
     >>> exp.evaluate({})
     12.0
     """
+    # build up the expression recursively
     expression_so_far = EmptyExpr()
 
     # verify that every other value is a recognized operator
     proceed = verify_keywords(values)
 
     if proceed is not True:
+        # invalid keyword, abort parsing
         raise RamSyntaxOperatorException(line, number, proceed)
     elif values == []:
         # Base case: values is empty
         return expression_so_far
     elif len(values) == 1:
-        # Looking at a single value
+        # Looking at a single value to parse such as String, Num, Name
         expression_so_far = handle_single_value(line, number, values)
     else:
-        # Looking at multiple values to handle
+        # Parse multiple values recursively
         expression_so_far = handle_multiple_values(line, number, values,
                                                    expression_so_far)
 
@@ -100,10 +101,10 @@ def parse_expression(line: str, number: int, values: list) -> Expr:
 def handle_single_value(line: str, number: int, values: list) -> Expr:
     """Return a parsed expression of a single value in values. """
     if isinstance(values[0], list):
-        # single value is a list and must be recursively parsed.
+        # single value is a list and must be parsed recursively.
         return parse_expression(line, number, values[0])
     else:
-        # single value is an expression and can be returned
+        # single value is an expression and can be returned.
         return get_expression_single_value(values[0])
 
 
@@ -113,16 +114,19 @@ def handle_multiple_values(line: str, number: int, values: list,
     val, next_val = values[0], values[1]  # prepare for operator
 
     if next_val in {'*', '/', '+', '-'}:
-        # currently groups rest of operation together recursively
+        # create BinOp around operator next_val
         expression_so_far = BinOp(
             parse_expression(line, number, values[0:1]), next_val,
             parse_expression(line, number, values[2:]))
     elif next_val in {'or', 'and'}:
+        # create BoolOp around operator next_val
         expression_so_far = BoolOp(
             val, [parse_expression(line, number, values[0:1]),
                   parse_expression(line, number, values[2:])])
     else:
-        raise RamSyntaxException(line, number)
+        # next_val not in OPERATORS. This branch should not be
+        # entered given verify_keywords has been called on values.
+        raise RamSyntaxOperatorException(line, number, next_val)
 
     return expression_so_far
 
