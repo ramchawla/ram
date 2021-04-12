@@ -204,10 +204,12 @@ def parse_function(header_line: str, header_list: list[Union[str, list]],
         >>> ... [Assign('z', BinOp(Name('x'), '+', Name('y')))], Name('z'))
 
         We would have to call parse_function this way:
+        >>> env = {}
         >>> f = parse_function('new function f takes (x,y)',
         ... ['new', 'function', 'f', 'takes', '(x,y)',  ['2', '+', '3']],
         ... [Line('set integer z to x + y', 2)], 'send back z', {})
-        >>> f.evaluate({'x': 10, 'y': 5})
+        >>> f.evaluate(env)
+        >>> env['f']({'x': 10, 'y': 5})
         15
     """
     # parse each statement in the function body

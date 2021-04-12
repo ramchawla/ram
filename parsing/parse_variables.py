@@ -26,11 +26,10 @@ OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
 
 def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) -> Assign:
     """ Parse a variable assignment statement.
-
-    Precondition:
-     - var_type in VAR_TYPES
-
-    >>> parse_variable('', 0, 'integer', ['var1', 'to', ['10', '+', '5']], {})
+    >>> env = {}
+    >>> assign = parse_variable('', 0, 'integer', ['var1', 'to', ['10', '+', '5']])
+    >>> assign.evaluate(env)
+    {'var1': 15.0}
     """
     if var_type not in VAR_TYPES:
         raise RamSyntaxKeywordException(line, number, var_type)

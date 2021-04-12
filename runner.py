@@ -35,15 +35,15 @@ def main() -> None:
         file_name = sys.argv[1]
     except Exception as e:
         print(e)
-        print("ERROR: Need File Name to be Run e.g 'exp main.ram'")
+        print('ERROR: Need File Name to be Run e.g \'ram main.ram\'')
         return None
 
     if file_name[len(file_name) - 4: len(file_name)] != ".ram":
-        print("ERROR: File extension not recognised.")
+        print('ERROR: File extension not recognised.')
         return None
 
     try:
-        print('ERROR: Expected 1 argument found 2.')
+        print('ERROR: Expected 1 argument, found 2.')
         return None
     except Exception as e:
         print(e)
@@ -51,5 +51,5 @@ def main() -> None:
     execute(file_name)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

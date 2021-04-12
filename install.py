@@ -26,7 +26,7 @@ class InstallExpo:
 
     def setup(self) -> None:
         """ Check the platform and perform install for that platform. """
-        if platform.system() == "Darwin":
+        if platform.system() == 'Darwin':
             self.install_route()
         else:
             print(f'Error installing, unknown platform {platform.system()}.')
@@ -34,13 +34,13 @@ class InstallExpo:
     def install_route(self) -> None:
         """ Create executable. """
         # changes the permissions of the fle to make it executable
-        os.system("chmod +x ./runner.py")
+        os.system('chmod +x ./runner.py')
         # Add customised directory to the $PATH
         os.system('export PATH="$PATH:$HOME/bin"')
         # Create a symbolic link to the script
-        os.system("ln -s " + os.getcwd() + "/runner.py /usr/local/bin/ram")
+        os.system('ln -s ' + os.getcwd() + '/runner.py /usr/local/bin/ram')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     installer = InstallExpo()
     installer.setup()
