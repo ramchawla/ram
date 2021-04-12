@@ -81,6 +81,7 @@ class Line:
     def __init__(self, line: str, number: int) -> None:
         self.line = line
         self.strs = get_line_as_list(line, number)
+        print(self.strs)
         self.number = number
         self.keyword = self.strs[0]
 
@@ -196,7 +197,7 @@ def parse_loop(header_line: str, header_list: list[Union[str, list]],
 
 
 def parse_function(header_line: str, header_list: list[Union[str, list]],
-               body: list[Line], rturn: str) -> Function:
+                   body: list[Line], rturn: str) -> Function:
     """ Parse a function into a Function statement.
         If we wanted the following to be returned:
         >>> Function('f', ['x', 'y'],
