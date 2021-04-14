@@ -126,7 +126,7 @@ class Block:
     'Reset'
     'Hello World!'
     """
-    block: list  # list of Line, str, and/or Block
+    block: list  # list of Line, tuple, and/or Block
     contents: list
     keyword: str
 
