@@ -138,13 +138,16 @@ class Block:
         for item in block:
             if isinstance(item, tuple):
                 # item is a header, like 'else if ... {'
+                # TODO: implement this case
                 ...
             elif isinstance(item, Block):
                 # item is another block, recurse
+                # TODO: implement this case
                 ...
             else:
+                # item is a line based on precondition
                 assert isinstance(item, Line)
-                # item is a line
+                # TODO: implement this case
                 ...
 
     def parse(self) -> Statement:
