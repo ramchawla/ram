@@ -109,49 +109,59 @@ class Line:
 class Block:
     """ A block of Ram code to parse.
 
-    >>> block = Block([('loop with x from 0 to 4 {', 2), ('display x', 3), ('}', 4)])
-    >>> block_statement = block.parse()
+    >>> block1 = Block([('loop with x from 0 to 4 {', 2), Line('display x', 3), ('}', 4)])
+    >>> block_statement = block1.parse()
     >>> block_statement.evaluate({})
     0
     1
     2
     3
+    >>> block2 = Block([('if (var1) is (0) {', 1), Line('set integer x to 4 * 3', 2),
+    >>> ... Line('display "The End"', 3), ('} else if (var1) is (15) {', 4),
+    >>> ... Block([('if (y + 2) is (x) {', 5), Line('reset integer y to 2', 6),
+    >>> ... Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
+    >>> ... ('}', 10) ])
+    >>> block_statement = block2.parse()
+    >>> block_statement.evaluate({'var1': 15, 'y': 10})
+    'Reset'
+    'Hello World!'
     """
-    header: str
-    body: list  # list of Line or Block
+    block: list  # list of Line, str, and/or Block
+    contents: list
     keyword: str
 
     def __init__(self, block: list[tuple[str, int]]) -> None:
-        # split the header by taking the first line of the block (block[0][0])
-        # from the beginning to the index of the '{'
-        self.header = block[0][0][0: block[0][0].index('{')]
-        self.keyword = self.header.split()[0]
-        self.body = []
+        self.block = block
+        self.keyword = block[0][0].split()[0]
+        self.contents = []
 
-        for line_data in block[1:]:
-            line, line_number = line_data
-            # TODO: not necessarily a line, could have nested blocks.
-            if line.strip() != '}':
-                # TODO: do not create a Line instance for return block
-                self.body.append(Line(line, line_number))
-
-        if len(self.header.split()) < 2:
-            # if the length of split line is less than two,
-            # only a keyword is detected and nothing else.
-            raise RamSyntaxException(self.header, block[0][1], 'Error parsing.')
+        for item in block:
+            if isinstance(item, tuple):
+                # item is a header, like 'else if ... {'
+                ...
+            elif isinstance(item, Block):
+                # item is another block, recurse
+                ...
+            else:
+                assert isinstance(item, Line)
+                # item is a line
+                ...
 
     def parse(self) -> Statement:
         """ Parse a block of Ram code. """
         if self.keyword == 'loop':
             # parse a loop statement
-            return parse_loop(self.header, self.header.split(), self.body)
+            return parse_loop(...)
         elif self.keyword == 'new':
             # parse a function statement
             # TODO: figure out return statement and replace ... with it
-            return parse_function(self.header, self.header.split(), self.body, ...)
+            return parse_function(...)
         elif self.keyword == 'if':
             # TODO: implement
             ...
+        else:
+            # keyword not recognized
+            raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
 
 
 def parse_loop(header_line: str, header_list: list[Union[str, list]],
@@ -163,7 +173,7 @@ def parse_loop(header_line: str, header_list: list[Union[str, list]],
     We have to call parse_loop as follows:
     >>> parse_loop('loop with x from 1 to (2 + 3)',
         ... ['loop', 'with', 'x', 'from', '1', 'to', ['2', '+', '3']],
-        ... [Line('display x * 2', 2)], {})
+        ... [Line('display x * 2', 2)])
     """
     # parse each statement in the body
     body_statements = [line.parse() for line in body]
