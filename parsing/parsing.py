@@ -182,7 +182,7 @@ def parse_loop(header_line: str, header_list: list[Union[str, list]],
         # get the name of the loop variable
         var_name = header_list[2]
 
-        # parse the start and stop conditions and return Loop instance
+        # parse the start and stop conditions and return Loop object
         start = parse_expression(header_line, line_number, header_list[4])
         stop = parse_expression(header_line, line_number, header_list[6])
 

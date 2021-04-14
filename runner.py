@@ -37,7 +37,7 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         in the form [(<line>, <line_number>), ...]
         and returns a list that correctly nests blocks.
 
-        For example, the following lines of Ram Code:
+        For example, with following lines of Ram Code:
 
         1  loop with j from (15) to (var1) {
         2      loop with k from 1 to 2 {
@@ -48,15 +48,17 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         7
         8 reset integer var1 to 4
 
-        would correspond to:
+        the call to this function would look like:
         >>> process_ram([('loop with j from (15) to (var1) {', 1),
         >>> ... ('loop with k from 1 to 2 {', 2), ('display j + k', 3), ('}', 4),
         >>> ... ('display j', 5), ('}', 6) ])
         [Block([('loop with j from (15) to (var1) {', 1), Block([('loop with k from 1 to 2 {', 2),
-        ('display j + k', 3), ('}', 4)]), ('display j', 5), ('}', 6)]),
+        Line('display j + k', 3), ('}', 4)]), Line('display j', 5), ('}', 6)]),
         Line('reset integer var1 to 4', 8)]
 
         Note the nesting of Blocks and Lines ^ and how empty lines are ignored.
+
+        As another example, take the following lines of Ram code:
 
         1  if (var1) is (0) {
         2      reset integer x to 4 * 3
@@ -69,14 +71,22 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         9      display 'Hello World!'
         10 }
 
-        would correspond to:
-        >>> process_ram([Block([('if (var1) is (0) {', 1), ('set integer x to 4 * 3', 2),
+        and this function would be called this way:
+        >>> process_ram([('if (var1) is (0) {', 1), ('reset integer x to 4 * 3', 2),
         >>> ... ('display "The End"', 3), ('} else if (var1) is (15) {', 4),
-        >>> ... Block([('if (y + 2) is (x) {', 5), ('reset integer y to 2', 6),
-        >>> ... ('display "Reset"', 7), ('}', 8)]), ('display "Hello World!"', 9), ('}', 10) ]])
+        >>> ... ('if (y + 2) is (x) {', 5), ('reset integer y to 2' , 6), ('display "Reset"', 7),
+        >>> ... ('}', 8), ('display "Hello World!"', 9), ('}', 10)])
+        [Block([('if (var1) is (0) {', 1), Line('set integer x to 4 * 3', 2),
+        Line('display "The End"', 3), ('} else if (var1) is (15) {', 4),
+        Block([('if (y + 2) is (x) {', 5), Line('reset integer y to 2', 6),
+        Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
+        ('}', 10) ]]
     """
     # TODO: implement this function
     # Note that this is fairly complex and will definitely involve recursion.
+    # It's going to be based on identifying blocks by the '{' and '}' characters.
+    # Note how an if statement (including else ifs and else) is all ONE block by
+    # the example shown in the docstring.
     ...
 
 
