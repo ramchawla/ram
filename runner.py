@@ -57,6 +57,23 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         Line('reset integer var1 to 4', 8)]
 
         Note the nesting of Blocks and Lines ^ and how empty lines are ignored.
+
+        1  if (var1) is (0) {
+        2      reset integer x to 4 * 3
+        3      display 'The End'
+        4  } else if (var1) is (15) {
+        5      if (y + 2) is (x) {
+        6          reset integer y to 2
+        7          display 'Reset'
+        8      }
+        9      display 'Hello World!'
+        10 }
+
+        would correspond to:
+        >>> process_ram([Block([('if (var1) is (0) {', 1), ('set integer x to 4 * 3', 2),
+        >>> ... ('display "The End"', 3), ('} else if (var1) is (15) {', 4),
+        >>> ... Block([('if (y + 2) is (x) {', 5), ('reset integer y to 2', 6),
+        >>> ... ('display "Reset"', 7), ('}', 8)]), ('display "Hello World!"', 9), ('}', 10) ]])
     """
     # TODO: implement this function
     # Note that this is fairly complex and will definitely involve recursion.
