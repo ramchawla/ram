@@ -74,33 +74,23 @@ class Display(Statement):
 class If(Statement):
     """An if statement.
 
-    This is a statement of the form:
-
-        if <test>:
-            <body>
-        else:
-            <orelse>
-
     Instance Attributes:
-        - test: The condition expression of this if statement.
-        - body: A sequence of statements to evaluate if the condition is True.
-        - orelse: A sequence of statements to evaluate if the condition is False.
-                  (This would be empty in the case that there is no `else` block.)
+        - evals: a tuple consition of a boolean expression and a list of statements
+          to be executed should that boolean expression evaluate to True.
+        - orelse: a list of statements should none of the evals be executed.
 
     >>> from expressions import Compare
-    >>> from datatypes import Num, Name
+    >>> from datatypes import Num, Name, String
     >>> from operators import BinOp
-    >>> If(
-    ...    Compare(Name('x'), [('<', Num(100))]),
-    ...    [Display(Name('x'))],
-    ...    [Assign('y', BinOp(Name('x'), '+', Num(2))),
-    ...     Assign('x', Num(1))]
-    ... )
-    >>> If(
-    ...    Compare(Name('x'), [('<', Num(100))]),
-    ...    [Display(Name('x'))],
-    ...    []
-    ... )
+    >>> iff = If([(Compare(Name('x'), [('<', Num(100))]), [Display(Name('x'))]),
+    >>> ... (Compare(Name('x'), [('<', Num(200))]), [Display(String('Hello World!'))])],
+    >>> ... [Display(String('Nope.'))])
+    >>> iff.evaluate({'x': 10})
+    10
+    >>> iff.evaluate({'x': 100})
+    'Hello World!'
+    >>> iff .evaluate({'x': 200})
+    'Nope.'
     """
     evals: list[tuple[Expr, list[Statement]]]
     orelse: list[Statement]
@@ -113,7 +103,7 @@ class If(Statement):
         """Evaluate this statement.
 
         Preconditions:
-            - all(isinstance(branch[0], bool) for branch in self.evals)
+            - all(isinstance(branch[0].evaluate({env}), bool) for branch in self.evals)
 
         >>> from datatypes import Bool, Num
         >>> stmt = If([(Bool(True),
