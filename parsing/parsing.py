@@ -39,7 +39,7 @@ def get_line_as_list(line: str, number: int) -> list[str]:
         # only a keyword is detected and nothing else.
         raise RamSyntaxException(line, number, 'Error parsing.')
 
-    # keyword of line such as 'display', 'set'
+    # keyword of line such as 'display', 'set', etc.
     keyword = split_list[0]
 
     if keyword == 'set' or keyword == 'reset':
@@ -81,7 +81,6 @@ class Line:
     def __init__(self, line: str, number: int) -> None:
         self.line = line
         self.strs = get_line_as_list(line, number)
-        print(self.strs)
         self.number = number
         self.keyword = self.strs[0]
 
