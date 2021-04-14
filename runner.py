@@ -13,7 +13,7 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 import sys
-from typing import Tuple, Union
+from typing import Union
 
 from abs import Module
 from parsing import Block, Line
@@ -53,10 +53,10 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         >>> ... ('loop with k from 1 to 2 {', 2), ('display j + k', 3), ('}', 4),
         >>> ... ('display j', 5), ('}', 6) ])
         [Block([('loop with j from (15) to (var1) {', 1), Block([('loop with k from 1 to 2 {', 2),
-        ('display j + k', 3), ('}', 4)]), ('display j', 5), ('}', 6)]), Line('', 7),
+        ('display j + k', 3), ('}', 4)]), ('display j', 5), ('}', 6)]),
         Line('reset integer var1 to 4', 8)]
 
-        Note the nesting of Blocks and Lines ^
+        Note the nesting of Blocks and Lines ^ and how empty lines are ignored.
     """
     # TODO: implement this function
     # Note that this is fairly complex and will definitely involve recursion.
