@@ -28,42 +28,42 @@ def pedmas(sequence: list[str]) -> list[Union[str, list]]:
        >>> pedmas(['4', '+', '2', '*', '7', '-', '1'])
        ['4', '+', ['2', '*', '7'], '-', '1']
 
-       # TODO: these cases are not working correctly
        >>> pedmas(['10', '-', 'x', '+', '5'])
        [['10', '-', 'x'] '+', '5']
        >>> pedmas(['3', '-', 'y', '-', '4', '+', '2'])
        [[[['3', '-', 'y'], '-', '4'], '+', '2']]
     """
-    d = 0
+    count1 = 0
+    count2 = 0
+    for i in sequence:
+        if i == "*" or i == '/':
+            count1 += 1
+        if i == "+" or i == "-":
+            count2 += 1
 
-    for item in sequence:
-        if item == '*' or item == '/':
-            d += 1
-
-    equation = pedmas_helper(sequence, d)
-    return equation
+    equation_1 = pedmas_helper(sequence, count1, '*', '/')
+    equation_2 = pedmas_helper(equation_1, count2, '+', '-')
+    return equation_2
 
 
-def pedmas_helper(sequence: list[str], d: int):
+def pedmas_helper(sequence: list[str], d: int, operation_1: str, operation_2: str) -> list:
     """helper function for pedmas function"""
     if d == 0:
         return sequence
+    else:
+        lst = []
+        for index in range(len(sequence) - 1):
+            # lets assume the operation will have another element to the right of it most definetely
+            if sequence[index + 1] == operation_1 or sequence[index + 1] == operation_2:
+                temp_lst = [sequence[index], sequence[index + 1], sequence[index + 2]]
+                lst.append(temp_lst)
+                lst += sequence[index + 3:]  # will take everything after
+                return pedmas_helper(lst, d - 1, operation_1, operation_2)
+            else:
+                lst.append(sequence[index])
 
-    new_list = []
-
-    for index in range(len(sequence) - 1):
-        if sequence[index + 1] == '*' or sequence[index + 1] == '/':
-            lst = [sequence[index], sequence[index + 1], sequence[index + 2]]
-
-            new_list.append(lst)
-            new_list.extend(sequence[index + 3:])
-
-            d = d - 1
-            return pedmas_helper(new_list, d)
-        else:
-            new_list.append(sequence[index])
-
-    return sequence
+        lst.append(sequence[-1])
+        return lst
 
 
 def lexify(line: str) -> list[Union[str, list]]:
