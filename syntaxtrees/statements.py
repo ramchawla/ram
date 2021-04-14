@@ -89,7 +89,7 @@ class If(Statement):
     10
     >>> iff.evaluate({'x': 100})
     'Hello World!'
-    >>> iff .evaluate({'x': 200})
+    >>> iff.evaluate({'x': 200})
     'Nope.'
     """
     evals: list[tuple[Expr, list[Statement]]]
@@ -230,4 +230,5 @@ class Function(Statement):
 
     def evaluate(self, env: dict[str, Any]) -> None:
         """Evaluate a function assignment. """
+        # add function reference to environment
         env[self.name] = self.call
