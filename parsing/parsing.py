@@ -11,6 +11,7 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 from typing import Union
+import enum
 
 try:
     from parsing.parse_variables import parse_expression, parse_variable
@@ -22,13 +23,19 @@ except ModuleNotFoundError:
 from syntaxtrees.abs import Statement, Expr
 from syntaxtrees.datatypes import Name, Num
 from syntaxtrees.operators import BinOp
-from syntaxtrees.statements import Assign, Display, Function, Loop
+from syntaxtrees.statements import Assign, Display, Function, Loop, If
 
 from exceptions import RamSyntaxException, RamSyntaxKeywordException
 
 # Globals
 VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
+
+
+class BLOCK_ENUMS(enum.Enum):
+    LoopType = 'loop'
+    IfType = 'if'
+    FunctionType = 'new'
 
 
 def get_line_as_list(line: str, number: int) -> list[str]:
@@ -138,37 +145,181 @@ class Block:
         self.block = block
         self.keyword = block[0][0].split()[0]
         self.contents = []
+        self.child_type = None
 
-        for item in block:
-            if isinstance(item, tuple):
-                # item is a header, like 'else if ... {'
-                # TODO: implement this case
-                ...
-            elif isinstance(item, Block):
-                # item is another block, recurse
-                # TODO: implement this case
-                ...
-            else:
-                # item is a line based on precondition
-                assert isinstance(item, Line)
-                # TODO: implement this case
-                ...
-
-    def parse(self) -> Statement:
-        """ Parse a block of Ram code. """
         if self.keyword == 'loop':
-            # parse a loop statement
-            return parse_loop(...)
+            # TODO: Add doc
+            self.child_type = BLOCK_ENUMS.LoopType
         elif self.keyword == 'new':
-            # parse a function statement
-            # TODO: figure out return statement and replace ... with it
-            return parse_function(...)
+            # TODO: Add doc
+            self.child_type = BLOCK_ENUMS.FunctionType
         elif self.keyword == 'if':
-            # TODO: implement
-            ...
+            # TODO: Add doc
+            self.child_type = BLOCK_ENUMS.IfType
         else:
             # keyword not recognized
             raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
+
+        parsed_block = self.make_child(keyword=self.keyword, block=self.block)
+        self.__class__ = parsed_block.__class__
+        self.__dict__ = parsed_block.__dict__
+
+        # for item in block:
+        #     if isinstance(item, tuple):
+        #         # item is a header, like 'else if ... {'
+        #         # TODO: implement this case
+        #         ...
+        #     elif isinstance(item, Block):
+        #         # item is another block, recurse
+        #         # TODO: implement this case
+        #         ...
+        #     else:
+        #         # item is a line based on precondition
+        #         assert isinstance(item, Line)
+        #         # TODO: implement this case
+        #         ...
+
+
+    def evaluate_line(self):
+        created_index = []
+        self.contents.append([])
+        for item in self.block[1:]:
+            if isinstance(item, tuple):
+                if item[0].strip() != '}':
+                    self.contents.append([item])
+                    created_index = []
+                else:
+                    created_index = None
+            elif isinstance(item, Block):
+                # item is another block, parse
+                self.contents.append(item.parse())
+            else:
+                # item is a line based on precondition
+                assert isinstance(item, Line)
+                if created_index is not None:
+                    self.contents[-1].append(item.parse())
+                else:
+                    self.contents.append(item.parse())
+
+    def make_child(self, **kwargs):
+        if self.child_type is None:
+            raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
+
+        if self.child_type == BLOCK_ENUMS.LoopType:
+            return LoopBlock(**kwargs)
+        elif self.child_type == BLOCK_ENUMS.IfType:
+            return IfBlock(**kwargs)
+        elif self.child_type == BLOCK_ENUMS.FunctionType:
+            return FunctionBlock(**kwargs)
+
+    def parse(self) -> Statement:
+        """ Parse a block of Ram code. """
+        raise NotImplementedError
+
+
+class LoopBlock(Block):
+    def __init__(self, **kwargs):
+        if 'keyword' not in kwargs or 'block' not in kwargs:
+            #TODO: Create new exception here
+            ...
+        self.block = kwargs.get('block')
+        self.header = self.block[0][0][0: self.block[0][0].index('{')]
+        self.keyword = self.header.split()[0]
+        self.body = []
+        self.contents = []
+
+        self.evaluate_line()
+
+    def parse(self) -> Statement:
+        header_list = self.header.split()
+        line_number = self.block[0][1]
+
+        if len(header_list) != 7:
+            # loop statement not in correct form, cannot parse.
+            raise RamSyntaxException(self.header, line_number, 'Loop header cannot be parsed.')
+        elif header_list[1] != 'with':
+            raise RamSyntaxKeywordException(self.header, line_number, header_list[1])
+        elif header_list[3] != 'from':
+            raise RamSyntaxKeywordException(self.header, line_number, header_list[3])
+        elif header_list[5] != 'to':
+            raise RamSyntaxKeywordException(self.header, line_number, header_list[3])
+        else:
+            # get the name of the loop variable
+            var_name = header_list[2]
+
+            # parse the start and stop conditions and return Loop object
+            start = parse_expression(self.header, line_number, header_list[4])
+            stop = parse_expression(self.header, line_number, header_list[6])
+
+            return Loop(var_name, start, stop, self.contents)
+
+
+class FunctionBlock(Block):
+    def __init__(self, **kwargs):
+        if 'keyword' not in kwargs or 'block' not in kwargs:
+            # TODO: Create new exception here
+            ...
+        self.block = kwargs.get('block')
+        self.header = self.block[0][0][0: self.block[0][0].index('{')]
+        self.keyword = self.header.split()[0]
+        self.body = []
+        self.contents = []
+
+        self.evaluate_line()
+
+    def parse(self) -> Statement:
+        ...
+
+
+class IfBlock(Block):
+    def __init__(self, **kwargs):
+        if 'keyword' not in kwargs or 'block' not in kwargs:
+            # TODO: Create new exception here
+            ...
+        self.block = kwargs.get('block')
+        self.header = self.block[0][0][0: self.block[0][0].index('{')]
+        self.keyword = self.header.split()[0]
+        self.body = []
+        self.contents = []
+
+        self.evaluate_line()
+
+    def parse(self) -> Statement:
+        header_list = self.header.split()
+        line_number = self.block[0][1]
+        header_line = self.header.split()
+        print(self.block)
+        expression = parse_expression('', 0, header_line[1:])
+
+        else_exists = False
+        else_item = None
+        else_index = 0
+        if_actions = []
+        actions = []
+        for i in range(1, len(self.block)):
+            if isinstance(self.block[i], tuple):
+                else_exists = True
+                else_item = self.block[i]
+                else_index = i
+                break
+            if_actions.append(self.block[i].parse())
+        if else_exists:
+            if 'if' in else_item[0]:
+                item_split = else_item[0].split()
+                if item_split[1] != 'else':
+                    raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
+                elif item_split[2] != 'if':
+                    raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
+                new_block = self.block[else_index:]
+                x = new_block[0][0].replace("} else ", "")
+                new_block[0] = (x, new_block[0][1])
+                return If([(expression, if_actions)], [IfBlock(block=new_block, keyword='if').parse()])
+            else:
+                for action in self.block[else_index + 1:]:
+                    if isinstance(action, tuple):
+                        break
+                    actions.append(action.parse())
+        return If([(expression, if_actions)], actions)
 
 
 def parse_loop(header_line: str, header_list: list[Union[str, list]],

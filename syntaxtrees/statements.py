@@ -124,12 +124,21 @@ class If(Statement):
             # if test condition is True
             if test_val.evaluate(env):
                 # execute body and early return
+                print(body)
                 for statement in body:
-                    statement.evaluate(env)
+                    if isinstance(statement, list):
+                        for item in statement:
+                            item.evaluate(env)
+                    else:
+                        statement.evaluate(env)
                 return None
 
         for statement in self.orelse:
-            statement.evaluate(env)
+            if isinstance(statement, list):
+                for item in statement:
+                    item.evaluate(env)
+            else:
+                statement.evaluate(env)
 
 
 class Loop(Statement):
@@ -192,7 +201,11 @@ class Loop(Statement):
             env[self.target] = i
 
             for statement in self.body:
-                statement.evaluate(env)
+                if isinstance(statement, list):
+                    for item in statement:
+                        item.evaluate(env)
+                else:
+                    statement.evaluate(env)
 
 
 class Function(Statement):
