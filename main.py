@@ -16,6 +16,7 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 import process
+from exceptions import RamInstallException
 
 
 def run_command_line() -> str:
@@ -23,7 +24,7 @@ def run_command_line() -> str:
     try:
         reader = open('store.txt', 'r')
     except FileNotFoundError:
-        print('Ram not installed correctly.')
+        raise RamInstallException
     else:
         return reader.read() + '/' + process.verify_file()
 
