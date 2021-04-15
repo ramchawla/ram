@@ -140,14 +140,13 @@ class Block:
     'Reset'
     'Hello World!'
 
-    # FIXME: example not working
     >>> block2 = Block([('if var1 is 0 {', 1), Line('set integer x to 4 * 3', 2),
     >>> ...        Line('display x', 3), ('} else if var1 is 15 {', 4),
     >>> ...        Block([('if y is x {', 5), Line('reset integer y to 2', 6),
     >>> ...               Line('display y', 7), ('}', 8)]), Line('display 5', 9),
     >>> ...        ('}', 10)])
 
-    >>> b = Block([('loop with j from (15) to (var1) {', 1),
+    >>> b = Block([('loop with j from 15) to (var1) {', 1),
     >>> ... Block([('loop with k from 1 to 2 {', 2), Line('display j + k', 3), ('}', 4)]),
     >>> ... Line('display j', 5), ('}', 6)])
     """
@@ -188,7 +187,7 @@ class Block:
                     created_index = None
             elif isinstance(item, Block):
                 # item is another block, parse
-                self.contents.append(item.parse())
+                self.contents[-1].append(item.parse())
             else:
                 # item is a line based on precondition
                 assert isinstance(item, Line)
@@ -245,8 +244,8 @@ class LoopBlock(Block):
 
             # parse the start and stop conditions and return Loop object
             # TODO: start and stop conditions aren't simply header_list[4] or header_list[6]
-            start = parse_expression(self.header, line_number, header_list[4])
-            stop = parse_expression(self.header, line_number, header_list[6])
+            start = parse_expression(self.header, line_number, [header_list[4]])
+            stop = parse_expression(self.header, line_number, [header_list[6]])
 
             return Loop(var_name, start, stop, self.contents)
 
