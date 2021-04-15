@@ -190,13 +190,14 @@ class Loop(Statement):
         2
         3
         4
+        5
         """
         # 1. Evaluate start and stop
         start_val = int(self.start.evaluate(env))
         stop_val = int(self.stop.evaluate(env))
 
         # 2. Execute the body once for each number between start and stop - 1
-        for i in range(start_val, stop_val):
+        for i in range(start_val, stop_val + 1):
             # assign self.target to i in the variable environment env
             env[self.target] = i
 

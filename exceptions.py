@@ -59,5 +59,6 @@ class RamFileNotFoundException(RamFileException):
 
 
 class RamInstallException(Exception):
-    """ store.txt not found in current working directory. """
-    raise Exception('Ram not correctly installed. File \'store.txt\' not found.')
+    pass
+#     """ store.txt not found in current working directory. """
+#     super().__init__('Ram not correctly installed. File \'store.txt\' not found.')

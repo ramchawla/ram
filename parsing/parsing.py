@@ -129,6 +129,7 @@ class Block:
     1
     2
     3
+    4
     >>> block2 = Block([('if (var1) is (0) {', 1), Line('set integer x to 4 * 3', 2),
     >>> ... Line('display "The End"', 3), ('} else if (var1) is (15) {', 4),
     >>> ... Block([('if (y + 2) is (x) {', 5), Line('reset integer y to 2', 6),
@@ -138,6 +139,13 @@ class Block:
     >>> block_statement.evaluate({'var1': 15, 'y': 10})
     'Reset'
     'Hello World!'
+
+    # FIXME: example not working
+    >>> block2 = Block([('if var1 is 0 {', 1), Line('set integer x to 4 * 3', 2),
+    >>> ...        Line('display x', 3), ('} else if var1 is 15 {', 4),
+    >>> ...        Block([('if y is x {', 5), Line('reset integer y to 2', 6),
+    >>> ...               Line('display y', 7), ('}', 8)]), Line('display 5', 9),
+    >>> ...        ('}', 10)])
     """
     block: list  # list of Line, tuple, and/or Block
 
@@ -164,22 +172,6 @@ class Block:
         self.__class__ = parsed_block.__class__
         self.__dict__ = parsed_block.__dict__
 
-        # for item in block:
-        #     if isinstance(item, tuple):
-        #         # item is a header, like 'else if ... {'
-        #         # TODO: implement this case
-        #         ...
-        #     elif isinstance(item, Block):
-        #         # item is another block, recurse
-        #         # TODO: implement this case
-        #         ...
-        #     else:
-        #         # item is a line based on precondition
-        #         assert isinstance(item, Line)
-        #         # TODO: implement this case
-        #         ...
-
-
     def evaluate_line(self):
         created_index = []
         self.contents.append([])
@@ -196,6 +188,7 @@ class Block:
             else:
                 # item is a line based on precondition
                 assert isinstance(item, Line)
+                print(item.line)
                 if created_index is not None:
                     self.contents[-1].append(item.parse())
                 else:

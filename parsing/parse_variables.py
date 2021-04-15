@@ -16,12 +16,12 @@ from typing import Union
 from syntaxtrees.abs import EmptyExpr, Expr
 from syntaxtrees.datatypes import Bool, Name, Num
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
-from syntaxtrees.operators import BinOp, BoolOp
+from syntaxtrees.operators import BinOp, BoolOp, BoolEq
 from syntaxtrees.statements import Assign
 
 # Globals
 VAR_TYPES = ('integer', 'text')
-OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
+OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and', 'is')
 
 
 def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) -> Assign:
@@ -122,6 +122,10 @@ def handle_multiple_values(line: str, number: int, values: list,
         expression_so_far = BoolOp(
             val, [parse_expression(line, number, values[0:1]),
                   parse_expression(line, number, values[2:])])
+    elif next_val == 'is':
+        # create BoolEq around operator
+        expression_so_far = BoolEq(parse_expression(line, number, values[0:1]),
+                                   parse_expression(line, number, values[2:]))
     else:
         # next_val not in OPERATORS. This branch should not be
         # entered given verify_keywords has been called on values.

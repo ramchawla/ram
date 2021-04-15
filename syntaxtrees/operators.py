@@ -132,3 +132,27 @@ class BoolOp(Expr):
         """
         op_string = f' {self.op} '
         return f'({op_string.join([str(v) for v in self.operands])})'
+
+
+class BoolEq(Expr):
+    """ Boolean equality check. """
+    value1: Expr
+    value2: Expr
+
+    def __init__(self, value1: Expr, value2: Expr) -> None:
+        self.value1 = value1
+        self.value2 = value2
+
+    def evaluate(self, env: dict[str, Any]) -> Any:
+        """Return the *value* of this expression.
+
+        >>> from datatypes import Num
+        >>> exp = BoolEq(BinOp(Num(2), '+', Num(3)), BinOp(Num(8), '-', Num(3)))
+        >>> exp.evaluate({})
+        True
+        """
+        return self.value1.evaluate(env) == self.value2.evaluate(env)
+
+    def __str__(self) -> str:
+        """Return a string representation of this boolean expression."""
+        return str(self.value1) + ' is ' + str(self.value2)
