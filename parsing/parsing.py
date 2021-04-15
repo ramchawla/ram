@@ -133,8 +133,6 @@ class Block:
     'Hello World!'
     """
     block: list  # list of Line, tuple, and/or Block
-    contents: list
-    keyword: str
 
     def __init__(self, block: list[tuple[str, int]]) -> None:
         self.block = block
