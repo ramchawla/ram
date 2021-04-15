@@ -146,6 +146,10 @@ class Block:
     >>> ...        Block([('if y is x {', 5), Line('reset integer y to 2', 6),
     >>> ...               Line('display y', 7), ('}', 8)]), Line('display 5', 9),
     >>> ...        ('}', 10)])
+
+    >>> b = Block([('loop with j from (15) to (var1) {', 1),
+    >>> ... Block([('loop with k from 1 to 2 {', 2), Line('display j + k', 3), ('}', 4)]),
+    >>> ... Line('display j', 5), ('}', 6)])
     """
     block: list  # list of Line, tuple, and/or Block
 
@@ -188,7 +192,6 @@ class Block:
             else:
                 # item is a line based on precondition
                 assert isinstance(item, Line)
-                print(item.line)
                 if created_index is not None:
                     self.contents[-1].append(item.parse())
                 else:
@@ -241,6 +244,7 @@ class LoopBlock(Block):
             var_name = header_list[2]
 
             # parse the start and stop conditions and return Loop object
+            # TODO: start and stop conditions aren't simply header_list[4] or header_list[6]
             start = parse_expression(self.header, line_number, header_list[4])
             stop = parse_expression(self.header, line_number, header_list[6])
 
