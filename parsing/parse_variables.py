@@ -13,11 +13,11 @@ Ariel Chouminov, Ramya Chawla.
 """
 
 from typing import Union
-from abs import EmptyExpr, Expr
-from datatypes import Bool, Name, Num
+from syntaxtrees.abs import EmptyExpr, Expr
+from syntaxtrees.datatypes import Bool, Name, Num
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
-from operators import BinOp, BoolOp
-from statements import Assign
+from syntaxtrees.operators import BinOp, BoolOp
+from syntaxtrees.statements import Assign
 
 # Globals
 VAR_TYPES = ('integer', 'text')

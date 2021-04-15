@@ -1,7 +1,10 @@
 """
 Overview and Description
 ========================
-This Python module contains expression subclasses.
+This Python module creates an executable 'ram' so that
+a user can simply run a .ram file in terminal by
+
+~ % ram <filepath>.ram
 
 Copyright and Usage Information
 ===============================
@@ -15,7 +18,8 @@ import os
 import platform
 
 
-class InstallExpo:
+class InstallRam:
+
     """ Installer class. """
     def __init__(self) -> None:
         print('+------------------------------------------------------+')
@@ -28,6 +32,7 @@ class InstallExpo:
         """ Check the platform and perform install for that platform. """
         if platform.system() == 'Darwin':
             self.install_route()
+            self.create_store()
         else:
             print(f'Error installing, unknown platform {platform.system()}.')
 
@@ -40,7 +45,13 @@ class InstallExpo:
         # Create a symbolic link to the script
         os.system('ln -s ' + os.getcwd() + '/runner.py /usr/local/bin/ram')
 
+    def create_store(self) -> None:
+        """ Write to store.txt the path to this directory. """
+        reader = open(os.path.expanduser("~") + '/store.txt', 'w')
+        reader.write(os.getcwd())
+        reader.close()
+
 
 if __name__ == '__main__':
-    installer = InstallExpo()
+    installer = InstallRam()
     installer.setup()

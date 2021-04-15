@@ -44,3 +44,15 @@ class RamNameException(RamException):
     """ Undefined variable exception. """
     def __init__(self, line: str, line_number: int, foreign: str) -> None:
         RamException.__init__(self, line, line_number, f'Variable \'{foreign}\' not defined.')
+
+
+class RamFileException(Exception):
+    """Error reading a .ram file. """
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
+class RamFileNotFoundException(RamFileException):
+    """ .ram file path does not exist. """
+    def __init__(self, file_path: str) -> None:
+        super().__init__(f'File path \'{file_path}\' does not exist.')

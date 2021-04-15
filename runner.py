@@ -1,9 +1,12 @@
-#!/usr/local/bin python3
+#!/Library/Frameworks/Python.framework/Versions/3.9/bin/python3
 
 """
 Overview and Description
 ========================
-This Python module runs Ram code.
+This Python module runs Ram code. If the installer
+has been run, this file is created as an executable
+in usr/local/bin and the user can run a .ram file by
+the zsh command ~ % ram <filepath>.ram
 
 Copyright and Usage Information
 ===============================
@@ -15,8 +18,16 @@ Ariel Chouminov, Ramya Chawla.
 import sys
 from typing import Union
 
-from abs import Module
-from parsing import Block, Line
+from syntaxtrees.abs import Module
+
+try:
+    from parsing.parsing import Block, Line
+    CALLED_FROM = 'command'
+except ModuleNotFoundError:
+    from parsing import Block, Line
+    CALLED_FROM = 'console'
+
+from exceptions import RamFileException, RamFileNotFoundException
 
 
 def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
@@ -26,10 +37,13 @@ def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
     try:
         reader = open(file_path, 'r')
     except FileNotFoundError:
-        print(f'File path \'{file_path}\' does not exist.')
+        raise RamFileNotFoundException(file_path)
     else:
+        # create a list of tuples containing each line and its line number.
         lines = reader.readlines()
-        return process_ram([(lines[index].strip(), index + 1) for index in range(len(lines))])
+        tupled_lines = [(lines[index].strip(), index + 1) for index in range(len(lines))]
+
+        return process_ram(tupled_lines)
 
 
 def process_ram(file_lines: list) -> list[Union[Line, Block]]:
@@ -103,27 +117,52 @@ def main_parser(file_path: str) -> Module:
     return Module(statements)
 
 
+def verify_file(file_name=None) -> str:
+    """ Verify that the file being run exists and has correct
+        file extension .ram and return the file name if valid
+    """
+    try:
+        if file_name is None:
+            file_name = sys.argv[1]
+    except IndexError:
+        raise RamFileException('Need File Name to be Run e.g \'ram main.ram\'')
+
+    if '.' not in file_name:
+        raise RamFileException(f'Invalid file name \'{file_name}\', no extension specified.')
+    elif file_name.count('.') > 1:
+        raise RamFileException(f'Invalid file name \'{file_name}\'')
+    elif (file_extension := file_name[len(file_name) - file_name[::-1].index('.') - 1:]) != '.ram':
+        raise RamFileException(f'File extension \'{file_extension}\' not recognised.')
+
+    return file_name
+
+
+def run_command_line() -> str:
+    """ Run from the command line. """
+    try:
+        reader = open('store.txt', 'r')
+    except FileNotFoundError:
+        print('Ram not installed correctly.')
+    else:
+        return reader.read() + '/' + verify_file()
+
+
+def run_console() -> str:
+    """ Run from the console. """
+    to_run = input('Enter Ram file path (e.g. main.ram): ')
+    return verify_file(to_run)
+
+
 def main() -> None:
     """ Get command path and execute file """
-    try:
-        file_name = sys.argv[1]
-    except Exception as e:
-        print(e)
-        print('ERROR: Need File Name to be Run e.g \'ram main.ram\'')
-        return None
+    if CALLED_FROM == 'command':
+        file_path = run_command_line()
+    else:
+        assert CALLED_FROM == 'console'
+        file_path = run_console()
 
-    if file_name[len(file_name) - 4: len(file_name)] != ".ram":
-        print('ERROR: File extension not recognised.')
-        return None
-
-    try:
-        print('ERROR: Expected 1 argument, found 2.')
-        return None
-    except Exception as e:
-        print(e)
-
-    # parse the file and evaluate
-    module = main_parser(file_name)
+    # parse the file and evaluate the module
+    module = main_parser(file_path)
     module.evaluate()
 
 

@@ -10,7 +10,11 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from abs import Expr, Statement
+try:
+    from syntaxtrees.abs import Expr, Statement
+except ModuleNotFoundError:
+    from abs import Expr, Statement
+
 from typing import Any
 
 

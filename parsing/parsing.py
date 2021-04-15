@@ -12,12 +12,18 @@ Ariel Chouminov, Ramya Chawla.
 """
 from typing import Union
 
-from parse_variables import parse_expression, parse_variable
-from parse_numeric import lexify
+try:
+    from parsing.parse_variables import parse_expression, parse_variable
+    from parsing.parse_numeric import lexify
+except ModuleNotFoundError:
+    from parse_variables import parse_expression, parse_variable
+    from parse_numeric import lexify
+
 from syntaxtrees.abs import Statement, Expr
 from syntaxtrees.datatypes import Name, Num
 from syntaxtrees.operators import BinOp
 from syntaxtrees.statements import Assign, Display, Function, Loop
+
 from exceptions import RamSyntaxException, RamSyntaxKeywordException
 
 # Globals
