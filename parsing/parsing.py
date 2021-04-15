@@ -307,7 +307,15 @@ class IfBlock(Block):
             if_actions.append(self.block[i].parse())
         if else_exists:
             if 'if' in else_item[0]:
-                ...
+                item_split = else_item[0].split()
+                if item_split[1] != 'else':
+                    raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
+                elif item_split[2] != 'if':
+                    raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
+                new_block = self.block[else_index:]
+                x = new_block[0][0].replace("} else ", "")
+                new_block[0] = (x, new_block[0][1])
+                return If([(expression, if_actions)], [IfBlock(block=new_block, keyword='if').parse()])
             else:
                 for action in self.block[else_index + 1:]:
                     if isinstance(action, tuple):
