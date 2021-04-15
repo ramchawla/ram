@@ -29,11 +29,11 @@ class InstallRam:
 
     def setup(self) -> None:
         """ Check the platform and perform install for that platform. """
-        if platform.system() == 'Darwin':
+        if (user_platform := platform.system()) == 'Darwin':
             self.install_route()
             self.create_store()
         else:
-            print(f'Error installing, unknown platform {platform.system()}.')
+            print(f'Error installing, unknown platform {user_platform}.')
 
     def install_route(self) -> None:
         """ Create executable. """
