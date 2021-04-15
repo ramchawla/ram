@@ -19,7 +19,6 @@ import platform
 
 
 class InstallRam:
-
     """ Installer class. """
     def __init__(self) -> None:
         print('+------------------------------------------------------+')
@@ -39,15 +38,19 @@ class InstallRam:
     def install_route(self) -> None:
         """ Create executable. """
         # changes the permissions of the fle to make it executable
-        os.system('chmod +x ./runner.py')
+        os.system('chmod +x ./main.py')
         # Add customised directory to the $PATH
         os.system('export PATH="$PATH:$HOME/bin"')
         # Create a symbolic link to the script
-        os.system('ln -s ' + os.getcwd() + '/runner.py /usr/local/bin/ram')
+        os.system('ln -s ' + os.getcwd() + '/main.py /usr/local/bin/ram')
 
     def create_store(self) -> None:
         """ Write to store.txt the path to this directory. """
         reader = open(os.path.expanduser("~") + '/store.txt', 'w')
+        reader.write(os.getcwd())
+        reader.close()
+
+        reader = open('store.txt', 'w')
         reader.write(os.getcwd())
         reader.close()
 
