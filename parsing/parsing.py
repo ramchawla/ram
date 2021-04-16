@@ -115,7 +115,6 @@ class Line:
             # display (print) statement
             return parse_display(self.line, self.number, self.strs[1:])
         elif self.keyword == 'send':
-            print(self.line, self.number, self.strs[1:])
             return parse_return(self.line, len(self.strs), self.strs)
         else:
             # keyword not recognized
@@ -271,7 +270,6 @@ class FunctionBlock(Block):
     def parse(self) -> Statement:
         line_number = self.block[0][1]
         header_list = self.header.split()
-        print(header_list, self.contents, self.block)
         if len(header_list) != 5:
             # function statement not in correct form, cannot parse.
             raise RamSyntaxException(self.header, line_number, 'Function header cannot be parsed.')
@@ -286,11 +284,14 @@ class FunctionBlock(Block):
 
             # get the name of the function and the return expression and return Function
             function_name = header_list[2]
-            if isinstance(self.block[-2], Expr):
-                rturn_expr = self.block[-2]
+            print('return is:', self.block[-2])
+            if isinstance(self.block[-2], Line):
+                rturn_expr = parse_return(self.block[-2].line, line_number, self.block[-2].line.split())
+                self.contents[0].pop()
             else:
                 rturn_expr = EmptyExpr()
-            return Function(function_name, param_names, self.contents, rturn_expr)
+            print('contents is:',self.contents)
+            return Function(function_name, param_names, self.contents[0], rturn_expr)
 
 
 class IfBlock(Block):
@@ -419,7 +420,6 @@ def parse_function(header_line: str, header_list: list[Union[str, list]],
 
         # get the name of the function and the return expression and return Function
         function_name = header_list[2]
-        print(rturn, body[-1].number + 1, rturn.split())
         rturn_expr = parse_return(rturn, body[-1].number + 1, rturn.split())
 
         return Function(function_name, param_names, body_statements, rturn_expr)
