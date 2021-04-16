@@ -57,13 +57,12 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         4      }
         5      display j
         6  }
-        7
-        8 reset integer var1 to 4
+        7 reset integer var1 to 4
 
         the call to this function would look like:
         >>> process_ram([('loop with j from (15) to (var1) {', 1),
         >>> ... ('loop with k from 1 to 2 {', 2), ('display j + k', 3), ('}', 4),
-        >>> ... ('display j', 5), ('}', 6) ])
+        >>> ... ('display j', 5), ('}', 6)])
         [Block([('loop with j from (15) to (var1) {', 1), Block([('loop with k from 1 to 2 {', 2),
         Line('display j + k', 3), ('}', 4)]), Line('display j', 5), ('}', 6)]),
         Line('reset integer var1 to 4', 8)]
@@ -94,12 +93,40 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
         ('}', 10) ]]
     """
-    # TODO: implement this function
     # Note that this is fairly complex and will definitely involve recursion.
     # It's going to be based on identifying blocks by the '{' and '}' characters.
     # Note how an if statement (including else ifs and else) is all ONE block by
     # the example shown in the docstring.
-    ...
+
+    visited = []
+    lst = helper_func(file_lines, 1, visited)[0]
+    return lst
+
+
+def helper_func(file_lines, line_number, visited: list):
+    """Loop till you find"""
+    contents = []
+
+    for line_index in range(line_number - 1, len(file_lines)):
+        if file_lines[line_index][1] not in visited:
+            visited.append(file_lines[line_index][1])
+
+            if '{' in file_lines[line_index]:
+                block = Block([file_lines[line_index][0]])
+                block.contents, visited = helper_func(file_lines, line_index + 1, visited)
+                block.block.append(block.contents)
+                contents.append(block)
+
+            if '}' in file_lines[line_index]:
+                # end of block
+                contents.append(('}', file_lines[line_index][1]))
+                break
+
+            else:  # its a line
+                line = Line(file_lines[line_index][0], file_lines[line_index][1])
+                contents.append(line.line)
+
+    return (contents, visited)
 
 
 def main_parser(file_path: str) -> Module:
