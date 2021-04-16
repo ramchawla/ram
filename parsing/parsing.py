@@ -20,7 +20,7 @@ except ModuleNotFoundError:
     from parse_variables import parse_expression, parse_variable
     from parse_numeric import lexify
 
-from syntaxtrees.abs import Statement, Expr
+from syntaxtrees.abs import EmptyExpr, Statement, Expr
 from syntaxtrees.datatypes import Name, Num
 from syntaxtrees.operators import BinOp
 from syntaxtrees.statements import Assign, Display, Function, Loop, If
@@ -289,7 +289,7 @@ class FunctionBlock(Block):
             if isinstance(self.block[-2], Expr):
                 rturn_expr = self.block[-2]
             else:
-                rturn_expr = None
+                rturn_expr = EmptyExpr()
             return Function(function_name, param_names, self.contents, rturn_expr)
 
 
