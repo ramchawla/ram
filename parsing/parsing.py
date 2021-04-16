@@ -288,8 +288,11 @@ class IfBlock(Block):
         header_line = self.header.split()
         expression_normal = self.header.replace("if ", "").split('is')
         expression_left = lexify(expression_normal[0])
-        expression_right = lexify(expression_normal[1])
-        expression_normal = expression_left + ['is'] + expression_right
+        if len(expression_normal) > 1:
+            expression_right = lexify(expression_normal[1])
+            expression_normal = expression_left + ['is'] + expression_right
+        else:
+            expression_normal = expression_left
         expression = parse_expression('', 0, expression_normal)
 
         else_exists = False
