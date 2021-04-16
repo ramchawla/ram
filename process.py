@@ -111,23 +111,25 @@ def helper_func(file_lines, line_number, visited: list):
         if file_lines[line_index][1] not in visited:
             visited.append(file_lines[line_index][1])
 
-            if '{' in file_lines[line_index]:
+            if '{' in file_lines[line_index][0]:
                 block = Block([file_lines[line_index][0]])
                 block.contents, visited = helper_func(file_lines, line_index + 1, visited)
-                block.block.append(block.contents)
+                block.block += block.contents
                 contents.append(block)
+                print(block.block, 'open bracket')
 
-            if '}' in file_lines[line_index]:
+            elif '}' in file_lines[line_index][0]:
                 # end of block
                 contents.append(('}', file_lines[line_index][1]))
+                # print(('}', file_lines[line_index][1]), 'closed bracket')
                 break
 
             else:  # its a line
                 line = Line(file_lines[line_index][0], file_lines[line_index][1])
                 contents.append(line.line)
+                # print(line.line, 'else statement')
 
     return (contents, visited)
-
 
 def main_parser(file_path: str) -> Module:
     """ Take in file_path and process the code.
