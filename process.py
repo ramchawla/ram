@@ -127,6 +127,7 @@ def helper_func(file_lines, line_number, visited: list):
                 block = Block([(file_lines[line_index][0], file_lines[line_index][1])])
                 block.contents, visited = helper_func(file_lines, line_index + 1, visited)
                 block.block += block.contents
+                block.evaluate_line()
                 contents.append(block)
 
             elif '}' in file_lines[line_index][0]:

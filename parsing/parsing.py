@@ -177,6 +177,7 @@ class Block:
 
     def evaluate_line(self):
         created_index = []
+        self.contents = []
         self.contents.append([])
         for item in self.block[1:]:
             if isinstance(item, tuple):
