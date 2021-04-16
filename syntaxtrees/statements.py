@@ -128,7 +128,6 @@ class If(Statement):
             # if test condition is True
             if test_val.evaluate(env):
                 # execute body and early return
-                print(body)
                 for statement in body:
                     if isinstance(statement, list):
                         for item in statement:
