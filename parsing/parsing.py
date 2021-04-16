@@ -55,7 +55,7 @@ def get_line_as_list(line: str, number: int) -> list[str]:
     # keyword of line such as 'display', 'set', etc.
     keyword = split_list[0]
 
-    if keyword == 'set' or keyword == 'reset':
+    if keyword == 'set' or keyword == 'reset' or keyword == 'send':
         # split into list of first 4 words and lexify the rest
         line_so_far = line.split()[:4]
         line_so_far += [lexify(' '.join(line.split()[4:]))]
@@ -114,6 +114,9 @@ class Line:
         elif self.keyword == 'display':
             # display (print) statement
             return parse_display(self.line, self.number, self.strs[1:])
+        elif self.keyword == 'send':
+            print(self.line, self.number, self.strs[1:])
+            return parse_return(self.line, len(self.strs), self.strs)
         else:
             # keyword not recognized
             raise RamSyntaxKeywordException(self.line, self.number, self.keyword)
@@ -283,8 +286,8 @@ class FunctionBlock(Block):
 
             # get the name of the function and the return expression and return Function
             function_name = header_list[2]
-            if isinstance(self.block[-2],Line):
-                rturn_expr = parse_return(self.block[-2], self.block[-2].number + 1, self.block[-2].split())
+            if isinstance(self.block[-2], Expr):
+                rturn_expr = self.block[-2]
             else:
                 rturn_expr = None
             return Function(function_name, param_names, self.contents, rturn_expr)
@@ -416,6 +419,7 @@ def parse_function(header_line: str, header_list: list[Union[str, list]],
 
         # get the name of the function and the return expression and return Function
         function_name = header_list[2]
+        print(rturn, body[-1].number + 1, rturn.split())
         rturn_expr = parse_return(rturn, body[-1].number + 1, rturn.split())
 
         return Function(function_name, param_names, body_statements, rturn_expr)
