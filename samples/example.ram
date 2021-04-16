@@ -1,0 +1,15 @@
+set integer var1 to  30
+
+loop with j from 15 to var1 {
+    loop with k from 1 to 2 {
+        display j + k
+    }
+}
+
+reset integer var1 to 15
+
+if (var1) is (0) {
+    display "The End"
+} else if (var1) is (15) {
+    display "Hello World!"
+}

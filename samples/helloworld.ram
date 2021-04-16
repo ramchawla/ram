@@ -1,0 +1,2 @@
+set text hello to "Hello World!"
+display hello
