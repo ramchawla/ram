@@ -90,7 +90,7 @@ class String(Expr):
         >>> str(String('hT5'))
         'hT5'
         """
-        return self.string
+        return f"'{self.string}'"
 
 
 class Bool(Expr):
@@ -143,7 +143,7 @@ class Name(Expr):
         if self.id in env:
             return env[self.id]
         else:
-            raise NameError
+            raise NameError(f'Variable {self.id} not defined.')
 
     def __str__(self) -> str:
         return self.id

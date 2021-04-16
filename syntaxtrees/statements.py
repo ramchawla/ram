@@ -74,6 +74,10 @@ class Display(Statement):
         """
         print(self.argument.evaluate(env))
 
+    def __str__(self) -> str:
+        """String representation of display"""
+        return f'display {str(self.argument)}'
+
 
 class If(Statement):
     """An if statement.
@@ -139,6 +143,26 @@ class If(Statement):
                     item.evaluate(env)
             else:
                 statement.evaluate(env)
+
+    def __str__(self) -> str:
+        """ Return string of If """
+        str_so_far = 'if %s: \n' % str(self.evals[0][0])
+        for statement in self.evals[0][1]:
+            str_so_far += '    %s\n' % str(statement)
+
+        for ev in self.evals[1:]:
+            str_so_far += 'else if %s: \n' % str(ev[0])
+            for statement in ev[1]:
+                str_so_far += '    %s\n' % str(statement)
+
+        if self.orelse == []:
+            return str_so_far
+
+        str_so_far += 'else:\n'
+        for statement in self.orelse:
+            str_so_far += '    %s\n' % str(statement)
+
+        return str_so_far
 
 
 class Loop(Statement):
@@ -207,6 +231,14 @@ class Loop(Statement):
                         item.evaluate(env)
                 else:
                     statement.evaluate(env)
+
+    def __str__(self) -> str:
+        """ String representation of a loop. """
+        str_so_far = f'loop with {str(self.target)} from {str(self.start)} to {str(self.stop)}:\n'
+        for statement in self.body:
+            str_so_far += f'    {str(statement)}\n'
+
+        return str_so_far
 
 
 class Function(Statement):

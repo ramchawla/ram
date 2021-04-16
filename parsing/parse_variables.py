@@ -14,7 +14,7 @@ Ariel Chouminov, Ramya Chawla.
 
 from typing import Union
 from syntaxtrees.abs import EmptyExpr, Expr
-from syntaxtrees.datatypes import Bool, Name, Num
+from syntaxtrees.datatypes import Bool, Name, Num, String
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
 from syntaxtrees.operators import BinOp, BoolOp, BoolEq
 from syntaxtrees.statements import Assign
@@ -150,5 +150,7 @@ def get_expression_single_value(value: str) -> Expr:
         return Num(float(value))
     elif value == 'true' or value == 'false':
         return Bool(value == 'true')
+    elif value[0] == '"' and value[-1] == '"':
+        return String(value.replace('"', ''))
     else:
         return Name(value)

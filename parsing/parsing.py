@@ -137,17 +137,17 @@ class Block:
     >>> ... ('}', 10) ])
     >>> block_statement = block2.parse()
     >>> block_statement.evaluate({'var1': 15, 'y': 10})
-    'Reset'
-    'Hello World!'
+    Reset
+    Hello World!
 
-    >>> block2 = Block([('if var1 is 0 {', 1), Line('set integer x to 4 * 3', 2),
-    >>> ...        Line('display x', 3), ('} else if var1 is 15 {', 4),
-    >>> ...        Block([('if y is x {', 5), Line('reset integer y to 2', 6),
+    >>> block2 = Block([('if (var1) is (0) {', 1), Line('set integer x to 4 * 3', 2),
+    >>> ...        Line('display x', 3), ('} else if (var1) is (15) {', 4),
+    >>> ...        Block([('if (y) is (x) {', 5), Line('reset integer y to 2', 6),
     >>> ...               Line('display y', 7), ('}', 8)]), Line('display 5', 9),
     >>> ...        ('}', 10)])
 
-    >>> b = Block([('loop with j from 15) to (var1) {', 1),
-    >>> ... Block([('loop with k from 1 to 2 {', 2), Line('display j + k', 3), ('}', 4)]),
+    >>> b = Block([('loop with j from (15) to (var1) {', 1),
+    >>> ... Block([('loop with k from (1) to (2) {', 2), Line('display j + k', 3), ('}', 4)]),
     >>> ... Line('display j', 5), ('}', 6)])
     """
     block: list  # list of Line, tuple, and/or Block
@@ -414,5 +414,7 @@ def parse_return(line: str, line_number: int, return_list: list[str]) -> Expr:
 
 def parse_display(line: str, number: int, value: list[str]) -> Statement:
     """ Parse a display assignment statement. """
-    value_expr = parse_expression(line, number, value)
-    return Display(value_expr)
+    if line.replace(' ', '').replace('display', '')[0] == '"':
+        return Display(parse_expression(line, number, [line.replace('display ', '')]))
+    else:
+        return Display(parse_expression(line, number, value))
