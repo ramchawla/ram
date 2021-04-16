@@ -274,14 +274,16 @@ class Function(Statement):
         self.body = body
         self.rturn = rturn
 
-    def call(self, params: dict[str, Any]) -> Expr:
+    def call(self, params: dict[str, Any]) -> Any:
         """ Precondition:
              - all(var in env for var in self.params)
         """
         for statement in self.body:
             statement.evaluate(params)
-
-        return self.rturn.evaluate(params)
+        if self.rturn:
+            return self.rturn.evaluate(params)
+        else:
+            return None
 
     def evaluate(self, env: dict[str, Any]) -> None:
         """Evaluate a function assignment. """

@@ -4,14 +4,3 @@ new function equals takes (x,y) {
     }
 }
 
-new function compute takes (number) {
-    if (number + 2) is 40 {
-        set integer z to number - 5
-    } else {
-        loop with i from (1) to (number) {
-            set integer z to i
-        }
-    }
-
-    send back z
-}
