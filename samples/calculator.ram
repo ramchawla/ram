@@ -1,0 +1,16 @@
+set integer x to 1
+
+loop with i from (2 + 3) to (10 - 2) {
+    set integer y to x + i
+    display y
+}
+
+display "This is a line break"
+
+loop with j from (y) to (12) {
+    if (j) is (11) {
+        display "Printing 11"
+    } else {
+        display j
+    }
+}

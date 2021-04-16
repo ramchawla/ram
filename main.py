@@ -26,7 +26,7 @@ def run_command_line() -> str:
     except FileNotFoundError:
         raise RamInstallException
     else:
-        return reader.read() + '/' + process.verify_file()
+        return reader.read().strip() + '/' + process.verify_file()
 
 
 def run_console() -> str:
