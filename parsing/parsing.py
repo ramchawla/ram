@@ -266,7 +266,28 @@ class FunctionBlock(Block):
         self.evaluate_line()
 
     def parse(self) -> Statement:
-        ...
+        line_number = self.block[0][1]
+        header_list = self.header.split()
+
+        if len(header_list) != 6:
+            # function statement not in correct form, cannot parse.
+            raise RamSyntaxException(self.header, line_number, 'Loop header cannot be parsed.')
+        elif header_list[1] != 'function':
+            raise RamSyntaxKeywordException(self.header, line_number, header_list[1])
+        elif header_list[3] != 'takes':
+            raise RamSyntaxKeywordException(self.header, line_number, header_list[3])
+        else:
+            # get a list of the parameter names in the form [<param1>, <param2>]
+            param_names = header_list[4].replace(' ', '').replace(
+                '(', '').replace(')', '').split(',')
+
+            # get the name of the function and the return expression and return Function
+            function_name = header_list[2]
+            if isinstance(self.block[-1], Line):
+                rturn_expr = parse_return(self.block[-1], body[-1].number + 1, rturn.split())
+            else:
+                rturn_expr = parse_return(None, body[-1].number + 1, None)
+            return Function(function_name, param_names, self.contents, rturn_expr)
 
 
 class IfBlock(Block):
