@@ -230,14 +230,15 @@ class LoopBlock(Block):
         header_list = self.header.split()
         line_number = self.block[0][1]
 
-        if len(header_list) != 7:
-            # loop statement not in correct form, cannot parse.
-            raise RamSyntaxException(self.header, line_number, 'Loop header cannot be parsed.')
-        elif header_list[1] != 'with':
+        loop_values = self.header.split('from ')[1]
+
+        expression_normal = loop_values.split('to')
+        left = lexify(expression_normal[0])
+        right = lexify(expression_normal[1])
+
+        if header_list[1] != 'with':
             raise RamSyntaxKeywordException(self.header, line_number, header_list[1])
         elif header_list[3] != 'from':
-            raise RamSyntaxKeywordException(self.header, line_number, header_list[3])
-        elif header_list[5] != 'to':
             raise RamSyntaxKeywordException(self.header, line_number, header_list[3])
         else:
             # get the name of the loop variable
@@ -245,8 +246,8 @@ class LoopBlock(Block):
 
             # parse the start and stop conditions and return Loop object
             # TODO: start and stop conditions aren't simply header_list[4] or header_list[6]
-            start = parse_expression(self.header, line_number, [header_list[4]])
-            stop = parse_expression(self.header, line_number, [header_list[6]])
+            start = parse_expression(self.header, line_number, left)
+            stop = parse_expression(self.header, line_number, right)
 
             return Loop(var_name, start, stop, self.contents)
 

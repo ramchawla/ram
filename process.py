@@ -138,14 +138,6 @@ def main_parser(file_path: str) -> Module:
     """
     code = read_file_as_list(file_path)
 
-    # This is working fine, creates correct Block objects
-    print(code)
-
-    # FIXME: this is where the error seems to be
-    # A single Loop AST is returned, but inside of it
-    # is a LoopBlock instead of a Loop AST.
-    print(code[1].parse().evaluate({'var1': 30}))
-
     statements = []
 
     for item in code:
