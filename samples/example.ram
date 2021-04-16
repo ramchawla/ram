@@ -1,21 +1,15 @@
-new function f takes (x) {
-    display 'processing'
-    set integer z to x - 5 * 3
-    send back z
-}
+set integer var1 to  30
 
-set integer var1 to f(30)
-
-loop with j from (15) to (var1) {
+loop with j from 15 to var1 {
     loop with k from 1 to 2 {
         display j + k
     }
 }
 
-reset integer var1 to f(15)
+reset integer var1 to 15
 
 if (var1) is (0) {
-    display 'The End'
+    display "The End"
 } else if (var1) is (15) {
-    display 'Hello World!'
+    display "Hello World!"
 }
