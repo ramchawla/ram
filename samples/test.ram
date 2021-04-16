@@ -1,0 +1,11 @@
+set integer x to 5 * 3 + (4 * 7)
+
+if (x) is (5) {
+    display "Here"
+} else {
+    display "We might be here."
+}
+
+loop with k from (1 * 4 - 3) to (x) {
+    display k - 2
+}

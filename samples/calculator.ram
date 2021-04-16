@@ -1,5 +1,6 @@
 new function f takes (x,y) {
-    send back x - y
+    set integer z to x - y
+    send back z
 }
 
 set integer z to 1

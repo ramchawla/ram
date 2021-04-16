@@ -278,6 +278,9 @@ class Function(Statement):
         """ Precondition:
              - all(var in env for var in self.params)
         """
+        print('Body', self.body)
+        print('Return', self.rturn)
+
         for statement in self.body:
             statement.evaluate(params)
         if self.rturn:
