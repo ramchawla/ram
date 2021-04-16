@@ -157,5 +157,15 @@ def get_expression_single_value(value: str) -> Expr:
         return Bool(value == 'true')
     elif value[0] == '"' and value[-1] == '"':
         return String(value.replace('"', ''))
+    elif '[' and ']' in value:
+        param_values = value[value.index('[') + 1: value.index(']')].split(',')
+        param_dict = {}
+        for param in param_values:
+            # FIXME: evaluate expressions
+            # print(param.split('='))
+            param_dict[param.split('=')[0]] = parse_expression('', 0, [param.split('=')[1]])
+
+        # print(param_dict)
+        return Name(value[:value.index('[')], param_dict)
     else:
         return Name(value)

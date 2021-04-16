@@ -252,9 +252,15 @@ class Function(Statement):
     We would create in instance of Function as follows:
     >>> from datatypes import Name, String
     >>> from operators import BinOp
+    >>> env = {}
     >>> f = Function('f', ['x', 'y'],
     >>> ... [Assign('z', BinOp(Name('x'), '+', Name('y')))], Name('z'))
-    >>> f.evaluate({'x': 10, 'y': 5})
+
+    Add a reference to the function to the env
+    >>> f.evaluate(env)
+
+    Call the function in the environment passing in arguments
+    >>> Name('f', {'x': 10, 'y': 5}).evaluate(env)
     15
     """
     name: str

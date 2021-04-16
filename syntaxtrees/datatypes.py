@@ -16,7 +16,7 @@ try:
 except ModuleNotFoundError:
     from abs import Expr
 
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 
 class Num(Expr):
@@ -41,7 +41,7 @@ class Num(Expr):
         >>> expr.evaluate({})
         10.5
         """
-        return self.n
+        return float(self.n)
 
     def __str__(self) -> str:
         """Return a string representation of this expression.
@@ -51,9 +51,9 @@ class Num(Expr):
         expression.
 
         >>> str(Num(5))
-        '5'
+        '5.0'
         """
-        return str(self.n)
+        return str(float(self.n))
 
 
 class String(Expr):
@@ -128,22 +128,30 @@ class Name(Expr):
 
     Instance Attributes:
       - id: The variable name in this expression.
-
-    >>>
     """
     id: str
+    arguments: Optional[dict[str, Expr]]
 
-    def __init__(self, id_: str) -> None:
+    def __init__(self, id_: str, arguments=None) -> None:
         """Initialize a new variable expression."""
         self.id = id_
+        self.arguments = arguments
 
     def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression using the given variable environment.
+
+        >>> from statements import Function, Assign
+        >>> from operators import BinOp
         """
         if self.id in env:
+            if callable(env[self.id]):
+                # self.id references a function
+                return env[self.id](self.arguments)
+
+            # self.id references a variable
             return env[self.id]
         else:
-            raise NameError(f'Variable {self.id} not defined.')
+            raise NameError(f'Variable \'{self.id}\' not defined.')
 
     def __str__(self) -> str:
         return self.id
