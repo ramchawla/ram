@@ -44,6 +44,7 @@ def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
         return process_ram(tupled_lines)
 
 
+
 def process_ram(file_lines: list) -> list[Union[Line, Block]]:
     """ Takes in the lines of a Ram file as a list of tuples
         in the form [(<line>, <line_number>), ...]
@@ -97,9 +98,16 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
     # It's going to be based on identifying blocks by the '{' and '}' characters.
     # Note how an if statement (including else ifs and else) is all ONE block by
     # the example shown in the docstring.
-
     visited = []
-    lst = helper_func(file_lines, 1, visited)[0]
+    file_lines_2 = [line for line in file_lines if line[0] != ""]
+    file_lines_3 = []
+
+    for line_index in range(0, len(file_lines_2)):
+        file_lines_3.append((file_lines_2[line_index][0], line_index + 1))
+
+    print(file_lines_3)
+    lst = helper_func(file_lines_3, 1, visited)[0]
+
     return lst
 
 
