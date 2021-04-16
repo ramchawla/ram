@@ -284,8 +284,14 @@ class IfBlock(Block):
         header_list = self.header.split()
         line_number = self.block[0][1]
         header_line = self.header.split()
-        print(self.block)
-        expression = parse_expression('', 0, header_line[1:])
+        expression_normal = self.header.replace("if ", "")
+        expression_normal = expression_normal.split('is')
+        expression_left = expression_normal[0]
+        expression_right = expression_normal[1]
+        expression_left = lexify(expression_left)
+        expression_right = lexify(expression_right)
+        expression_normal = expression_left + ['is'] + expression_right
+        expression = parse_expression('', 0, expression_normal)
 
         else_exists = False
         else_item = None
