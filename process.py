@@ -142,8 +142,8 @@ def main_parser(file_path: str) -> Module:
     print(code)
 
     # FIXME: this is where the error seems to be
-    # A single Loop AST is returned, but inside of it
-    # is a LoopBlock instead of a Loop AST.
+    # A single Loop AST is returned after calling LoopBlock.parse, but inside of it
+    # is another LoopBlock instead of a Loop AST.
     print(code[1].parse().evaluate({'var1': 30}))
 
     statements = []

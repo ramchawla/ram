@@ -48,7 +48,13 @@ def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) 
 
 def parse_assign(line: str, number: int, name: str, value: list[str]) -> Assign:
     """ Parse an assignment statement."""
-    value_expr = parse_expression(line, number, value)
+    if line.replace(' ', '').replace('display', '')[0] == '"':
+        print('here')
+        # value_expr = parse_expression(line, number, [line.replace('display ', '')])
+        value_expr = EmptyExpr()
+    else:
+        value_expr = parse_expression(line, number, value)
+
     return Assign(name, value_expr)
 
 
