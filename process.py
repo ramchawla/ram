@@ -5,7 +5,6 @@ This module determines whether ram is being run in
 the console or the command line and verifies the ram
 file is in the correct format and exists. It then creates
 a nested structure of the code in the file using Block.
-
 Copyright and Usage Information
 ===============================
 All forms of distribution of this code, whether as given or with any changes,
@@ -44,14 +43,11 @@ def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
         return process_ram(tupled_lines)
 
 
-
 def process_ram(file_lines: list) -> list[Union[Line, Block]]:
     """ Takes in the lines of a Ram file as a list of tuples
         in the form [(<line>, <line_number>), ...]
         and returns a list that correctly nests blocks.
-
         For example, with following lines of Ram Code:
-
         1  loop with j from (15) to (var1) {
         2      loop with k from 1 to 2 {
         3          display j + k
@@ -59,7 +55,6 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         5      display j
         6  }
         7 reset integer var1 to 4
-
         the call to this function would look like:
         >>> process_ram([('loop with j from (15) to (var1) {', 1),
         >>> ... ('loop with k from 1 to 2 {', 2), ('display j + k', 3), ('}', 4),
@@ -67,11 +62,8 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         [Block([('loop with j from (15) to (var1) {', 1), Block([('loop with k from 1 to 2 {', 2),
         Line('display j + k', 3), ('}', 4)]), Line('display j', 5), ('}', 6)]),
         Line('reset integer var1 to 4', 8)]
-
         Note the nesting of Blocks and Lines ^ and how empty lines are ignored.
-
         As another example, take the following lines of Ram code:
-
         1  if (var1) is (0) {
         2      reset integer x to 4 * 3
         3      display 'The End'
@@ -82,7 +74,6 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         8      }
         9      display 'Hello World!'
         10 }
-
         and this function would be called this way:
         >>> process_ram([('if (var1) is (0) {', 1), ('reset integer x to 4 * 3', 2),
         >>> ... ('display "The End"', 3), ('} else if (var1) is (15) {', 4),
@@ -105,7 +96,6 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
     for line_index in range(0, len(file_lines_2)):
         file_lines_3.append((file_lines_2[line_index][0], line_index + 1))
 
-    print(file_lines_3)
     lst = helper_func(file_lines_3, 1, visited)[0]
 
     return lst
@@ -146,7 +136,16 @@ def main_parser(file_path: str) -> Module:
     """ Take in file_path and process the code.
         Parse each line/block in the file and return a Module.
     """
-    code = process_ram(read_file_as_list(file_path))
+    code = read_file_as_list(file_path)
+
+    # This is working fine, creates correct Block objects
+    print(code)
+
+    # FIXME: this is where the error seems to be
+    # A single Loop AST is returned, but inside of it
+    # is a LoopBlock instead of a Loop AST.
+    print(code[1].parse().evaluate({'var1': 30}))
+
     statements = []
 
     for item in code:
