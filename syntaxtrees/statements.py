@@ -260,7 +260,8 @@ class Function(Statement):
     >>> f.evaluate(env)
 
     Call the function in the environment passing in arguments
-    >>> Name('f', {'x': 10, 'y': 5}).evaluate(env)
+    >>> from datatypes import Num
+    >>> Name('f', {'x': Num(10), 'y': Num(5)}).evaluate(env)
     15
     """
     name: str
@@ -274,17 +275,19 @@ class Function(Statement):
         self.body = body
         self.rturn = rturn
 
-    def call(self, params: dict[str, Any]) -> Any:
+    def call(self, params: dict[str, Expr]) -> Any:
         """ Precondition:
              - all(var in env for var in self.params)
         """
         print('Body', self.body)
         print('Return', self.rturn)
 
+        arguments = {arg_name: params[arg_name].evaluate({}) for arg_name in params}
+
         for statement in self.body:
-            statement.evaluate(params)
+            statement.evaluate(arguments)
         if self.rturn:
-            return self.rturn.evaluate(params)
+            return self.rturn.evaluate(arguments)
         else:
             return None
 
