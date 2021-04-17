@@ -56,9 +56,3 @@ class RamFileNotFoundException(RamFileException):
     """ .ram file path does not exist. """
     def __init__(self, file_path: str) -> None:
         super().__init__(f'File path \'{file_path}\' does not exist.')
-
-
-class RamInstallException(Exception):
-    pass
-#     """ store.txt not found in current working directory. """
-#     super().__init__('Ram not correctly installed. File \'store.txt\' not found.')

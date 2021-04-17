@@ -21,6 +21,13 @@ class Assign(Statement):
     Instance Attributes:
       - target: the variable name on the left-hand side of the = sign
       - value: the expression on the right-hand side of the = sign
+
+    >>> from datatypes import Num
+    >>> env = {}
+    >>> a = Assign('x', Num(5))
+    >>> a.evaluate(env)
+    >>> env
+    {'x': 5}
     """
     target: str
     value: Expr
@@ -203,9 +210,9 @@ class Loop(Statement):
         """Evaluate this statement.
         >>> from datatypes import Num, Name
         >>> from operators import BinOp
-        >>> statement = Loop('x', Num(1), BinOp(Num(2), '+', Num(3)),
+        >>> stmt = Loop('x', Num(1), BinOp(Num(2), '+', Num(3)),
         ...                      [Display(Name('x'))])
-        >>> statement.evaluate({})
+        >>> stmt.evaluate({})
         1
         2
         3
@@ -266,7 +273,8 @@ class Function(Statement):
     body: list[Statement]
     rturn: Expr
 
-    def __init__(self, name: str, params: list[str], body: list[Statement], rturn: Expr) -> None:
+    def __init__(self, name: str, params: list[str],
+                 body: list[Statement], rturn: Expr) -> None:
         self.name = name
         self.params = params
         self.body = body
