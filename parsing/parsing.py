@@ -62,8 +62,6 @@ def get_line_as_list(line: str, number: int) -> list[str]:
     else:
         raise RamSyntaxKeywordException(line, number, keyword)
 
-    # account for empty list from lexify
-    # TODO: fix anomaly causing empty list here?
     if [] in line_so_far:
         line_so_far.remove([])
 

@@ -24,11 +24,12 @@ from exceptions import RamFileException, RamFileNotFoundException
 
 def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
     """ Read a file containing Ram code and return its contents
-        as a list of strings. Handle case when file path is invalid.
+        as a list of Blocks and Lines.
     """
     try:
         reader = open(file_path, 'r')
     except FileNotFoundError:
+        # Raise exception if file is not found
         raise RamFileNotFoundException(file_path)
     else:
         # create a list of tuples containing each line and its line number.
@@ -80,24 +81,25 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
         ('}', 10) ]]
     """
-    # Note that this is fairly complex and will definitely involve recursion.
-    # It's going to be based on identifying blocks by the '{' and '}' characters.
-    # Note how an if statement (including else ifs and else) is all ONE block by
-    # the example shown in the docstring.
     visited = []
+    # Truncate empty lines
     file_lines_2 = [line for line in file_lines if line[0] != ""]
     file_lines_3 = []
 
+    # Recount line numbers after removing empty lines
     for line_index in range(0, len(file_lines_2)):
         file_lines_3.append((file_lines_2[line_index][0], line_index + 1))
 
+    # Recursively parse through each tuple
     lst = helper_func(file_lines_3, 1, visited)[0]
 
     return lst
 
 
 def helper_func(file_lines, line_number, visited: list):
-    """Loop till you find"""
+    """ Parses lines into blocks that hold each line's
+        child 
+    """
     contents = []
 
     for line_index in range(line_number - 1, len(file_lines)):
