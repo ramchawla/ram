@@ -280,13 +280,11 @@ class FunctionBlock(Block):
 
             # get the name of the function and the return expression and return Function
             function_name = header_list[2]
-            print('return is:', self.block[-2])
             if isinstance(self.block[-2], Line):
                 rturn_expr = parse_return(self.block[-2].line, line_number, self.block[-2].line.split())
                 self.contents[0].pop()
             else:
                 rturn_expr = EmptyExpr()
-            print('contents is:',self.contents)
             return Function(function_name, param_names, self.contents[0], rturn_expr)
 
 
