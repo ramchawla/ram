@@ -10,16 +10,14 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from typing import Any, Union
+from typing import Any
 import enum
 
 from .parse_variables import parse_expression, parse_variable
 from .parse_numeric import lexify
 
 from syntaxtrees.abs import EmptyExpr, Statement, Expr
-from syntaxtrees.datatypes import Name, Num
-from syntaxtrees.operators import BinOp
-from syntaxtrees.statements import Assign, Display, Function, Loop, If
+from syntaxtrees.statements import Display, Function, Loop, If
 
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamBlockException
 
