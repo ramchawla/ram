@@ -21,7 +21,7 @@ from syntaxtrees.datatypes import Name, Num
 from syntaxtrees.operators import BinOp
 from syntaxtrees.statements import Assign, Display, Function, Loop, If
 
-from exceptions import RamSyntaxException, RamSyntaxKeywordException
+from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamBlockException
 
 # Globals
 VAR_TYPES = ('integer', 'text')
@@ -93,7 +93,7 @@ class Line:
         self.keyword = self.strs[0]
 
     def parse(self) -> Statement:
-        """Parse a line of Ram code
+        """Parse a single line of Ram code
         >>> env = {'x': 5}
         >>> l1 = Line('set integer var1 to 10 * x + 5', 8)
         >>> l2 = Line('display var1', 2)
@@ -110,6 +110,7 @@ class Line:
             # display (print) statement
             return parse_display(self.line, self.number, self.strs[1:])
         elif self.keyword == 'send':
+            # function return statement
             return parse_return(self.line, len(self.strs), self.strs)
         else:
             # keyword not recognized
@@ -129,7 +130,7 @@ class Block:
     4
     >>> block2 = Block([('if (var1) is (0) {', 1), Line('set integer x to 4 * 3', 2),
     >>> ... Line('display "The End"', 3), ('} else if (var1) is (15) {', 4),
-    >>> ... Block([('if (y + 2) is (x) {', 5), Line('reset integer y to 2', 6),
+    >>> ... Block([('if (y + 2) is (3) {', 5), Line('reset integer y to 2', 6),
     >>> ... Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
     >>> ... ('}', 10) ])
     >>> block_statement = block2.parse()
@@ -156,13 +157,13 @@ class Block:
         self.child_type = None
 
         if self.keyword == 'loop':
-            # TODO: Add doc
+            # Loop type
             self.child_type = BlockEnums.LoopType
         elif self.keyword == 'new':
-            # TODO: Add doc
+            # Function type
             self.child_type = BlockEnums.FunctionType
         elif self.keyword == 'if':
-            # TODO: Add doc
+            # If type
             self.child_type = BlockEnums.IfType
         else:
             # keyword not recognized
@@ -173,6 +174,7 @@ class Block:
         self.__dict__ = parsed_block.__dict__
 
     def evaluate_line(self):
+        """ Parse all children blocks and/or lines """
         created_index = []
         self.contents = []
         self.contents.append([])
@@ -195,14 +197,19 @@ class Block:
                     self.contents.append(item.parse())
 
     def make_child(self, **kwargs):
+        """ Create new block subclass based on parent type
+        """
         if self.child_type is None:
             raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
 
         if self.child_type == BlockEnums.LoopType:
+            # Loop block type
             return LoopBlock(**kwargs)
         elif self.child_type == BlockEnums.IfType:
+            # If block type
             return IfBlock(**kwargs)
         elif self.child_type == BlockEnums.FunctionType:
+            # Function block type
             return FunctionBlock(**kwargs)
 
     def parse(self) -> Statement:
@@ -213,8 +220,7 @@ class Block:
 class LoopBlock(Block):
     def __init__(self, **kwargs):
         if 'keyword' not in kwargs or 'block' not in kwargs:
-            #TODO: Create new exception here
-            ...
+            raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
         self.header = self.block[0][0][0: self.block[0][0].index('{')]
         self.keyword = self.header.split()[0]
@@ -224,6 +230,7 @@ class LoopBlock(Block):
         self.evaluate_line()
 
     def parse(self) -> Statement:
+        """ Parse a loop block of Ram code. """
         header_list = self.header.split()
         line_number = self.block[0][1]
 
@@ -242,7 +249,6 @@ class LoopBlock(Block):
             var_name = header_list[2]
 
             # parse the start and stop conditions and return Loop object
-            # TODO: start and stop conditions aren't simply header_list[4] or header_list[6]
             start = parse_expression(self.header, line_number, left)
             stop = parse_expression(self.header, line_number, right)
 
@@ -252,8 +258,7 @@ class LoopBlock(Block):
 class FunctionBlock(Block):
     def __init__(self, **kwargs):
         if 'keyword' not in kwargs or 'block' not in kwargs:
-            # TODO: Create new exception here
-            ...
+            raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
         self.header = self.block[0][0][0: self.block[0][0].index('{')]
         self.keyword = self.header.split()[0]
@@ -263,6 +268,7 @@ class FunctionBlock(Block):
         self.evaluate_line()
 
     def parse(self) -> Statement:
+        """ Parse a function block of Ram code. """
         line_number = self.block[0][1]
         header_list = self.header.split()
         if len(header_list) != 5:
@@ -290,8 +296,7 @@ class FunctionBlock(Block):
 class IfBlock(Block):
     def __init__(self, **kwargs):
         if 'keyword' not in kwargs or 'block' not in kwargs:
-            # TODO: Create new exception here
-            ...
+            raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
         self.header = self.block[0][0][0: self.block[0][0].index('{')]
         self.keyword = self.header.split()[0]
@@ -301,6 +306,7 @@ class IfBlock(Block):
         self.evaluate_line()
 
     def parse(self) -> Statement:
+        """ Parse an if block of Ram code. """
         header_list = self.header.split()
         line_number = self.block[0][1]
         header_line = self.header.split()
@@ -342,80 +348,6 @@ class IfBlock(Block):
                         break
                     actions.append(action.parse())
         return If([(expression, if_actions)], actions)
-
-
-def parse_loop(header_line: str, header_list: list[Union[str, list]],
-               body: list[Union[Line, Block]]) -> Loop:
-    """Parse a loop block into a Loop statement.
-    If we wanted the following to be returned:
-    >>> Loop('x', Num(1), BinOp(Num(2), '+', Num(3)),
-        ... [Display(BinOp(Name('x'), '*', Num(2)))])
-    We have to call parse_loop as follows:
-    >>> parse_loop('loop with x from 1 to (2 + 3)',
-        ... ['loop', 'with', 'x', 'from', '1', 'to', ['2', '+', '3']],
-        ... [Line('display x * 2', 2)])
-    """
-    # parse each statement in the body
-    body_statements = [line.parse() for line in body]
-    line_number = body[0].number - 1
-
-    if len(header_list) != 7:
-        # loop statement not in correct form, cannot parse.
-        raise RamSyntaxException(header_line, line_number, 'Loop header cannot be parsed.')
-    elif header_list[1] != 'with':
-        raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
-    elif header_list[3] != 'from':
-        raise RamSyntaxKeywordException(header_line, line_number, header_list[3])
-    elif header_list[5] != 'to':
-        raise RamSyntaxKeywordException(header_line, line_number, header_list[3])
-    else:
-        # get the name of the loop variable
-        var_name = header_list[2]
-
-        # parse the start and stop conditions and return Loop object
-        start = parse_expression(header_line, line_number, header_list[4])
-        stop = parse_expression(header_line, line_number, header_list[6])
-
-        return Loop(var_name, start, stop, body_statements)
-
-
-def parse_function(header_line: str, header_list: list[Union[str, list]],
-                   body: list[Line], rturn: str) -> Function:
-    """ Parse a function into a Function statement.
-        If we wanted the following to be returned:
-        >>> Function('f', ['x', 'y'],
-        >>> ... [Assign('z', BinOp(Name('x'), '+', Name('y')))], Name('z'))
-
-        We would have to call parse_function this way:
-        >>> env = {}
-        >>> f = parse_function('new function f takes (x,y)',
-        ... ['new', 'function', 'f', 'takes', '(x,y)',  ['2', '+', '3']],
-        ... [Line('set integer z to x + y', 2)], 'send back z', {})
-        >>> f.evaluate(env)
-        >>> env['f']({'x': 10, 'y': 5})
-        15
-    """
-    # parse each statement in the function body
-    body_statements = [b.parse() for b in body]
-    line_number = body[0].number - 1
-
-    if len(header_list) != 6:
-        # function statement not in correct form, cannot parse.
-        raise RamSyntaxException(header_line, line_number, 'Loop header cannot be parsed.')
-    elif header_list[1] != 'function':
-        raise RamSyntaxKeywordException(header_line, line_number, header_list[1])
-    elif header_list[3] != 'takes':
-        raise RamSyntaxKeywordException(header_line, line_number, header_list[3])
-    else:
-        # get a list of the parameter names in the form [<param1>, <param2>]
-        param_names = header_list[4].replace(' ', '').replace(
-            '(', '').replace(')', '').split(',')
-
-        # get the name of the function and the return expression and return Function
-        function_name = header_list[2]
-        rturn_expr = parse_return(rturn, body[-1].number + 1, rturn.split())
-
-        return Function(function_name, param_names, body_statements, rturn_expr)
 
 
 def parse_return(line: str, line_number: int, return_list: list[str]) -> Expr:

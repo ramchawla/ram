@@ -45,6 +45,10 @@ class RamNameException(RamException):
     def __init__(self, line: str, line_number: int, foreign: str) -> None:
         RamException.__init__(self, line, line_number, f'Variable \'{foreign}\' not defined.')
 
+class RamBlockException(Exception):
+    """ Undefined block creation. """
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
 
 class RamFileException(Exception):
     """Error reading a .ram file. """
