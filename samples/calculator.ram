@@ -3,6 +3,12 @@ new function f takes (x,y) {
     send back z
 }
 
+new function compute takes (x) {
+    display x
+}
+
+display compute[x=4]
+
 set integer z to f[x=45,y=43]
 display z
 

@@ -279,7 +279,7 @@ class FunctionBlock(Block):
 
             # get the name of the function and the return expression and return Function
             function_name = header_list[2]
-            if isinstance(self.block[-2], Line):
+            if isinstance(self.block[-2], Line) and 'send' in self.block[-2].line:
                 rturn_expr = parse_return(self.block[-2].line, line_number, self.block[-2].line.split())
                 self.contents[0].pop()
             else:
