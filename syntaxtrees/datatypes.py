@@ -11,10 +11,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-try:
-    from syntaxtrees.abs import Expr
-except ModuleNotFoundError:
-    from abs import Expr
+from .abs import Expr
 
 from typing import Any, Optional, Union
 

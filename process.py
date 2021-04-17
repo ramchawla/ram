@@ -17,12 +17,7 @@ from typing import Union
 
 from syntaxtrees.abs import Module
 
-try:
-    from parsing.parsing import Block, Line
-    CALLED_FROM = 'command'
-except ModuleNotFoundError:
-    from parsing import Block, Line
-    CALLED_FROM = 'console'
+from parsing.parsing import Block, Line
 
 from exceptions import RamFileException, RamFileNotFoundException
 
@@ -154,7 +149,9 @@ def verify_file(file_name=None) -> str:
         if file_name is None:
             file_name = sys.argv[1]
     except IndexError:
-        raise RamFileException('Need File Name to be Run e.g \'ram main.ram\'')
+        print('Need File Name to be Run e.g \'ram main.ram\'')
+        in_file = input("Enter file path: ")
+        return verify_file(in_file)
 
     if '.' not in file_name:
         raise RamFileException(f'Invalid file name \'{file_name}\', no extension specified.')

@@ -31,7 +31,6 @@ class InstallRam:
         """ Check the platform and perform install for that platform. """
         if (user_platform := platform.system()) == 'Darwin':
             self.install_route()
-            self.create_store()
         else:
             print(f'Error installing, unknown platform {user_platform}.')
 
@@ -43,16 +42,6 @@ class InstallRam:
         os.system('export PATH="$PATH:$HOME/bin"')
         # Create a symbolic link to the script
         os.system('ln -s ' + os.getcwd() + '/main.py /usr/local/bin/ram')
-
-    def create_store(self) -> None:
-        """ Write to store.txt the path to this directory. """
-        reader = open(os.path.expanduser("~") + '/store.txt', 'w')
-        reader.write(os.getcwd())
-        reader.close()
-
-        reader = open('store.txt', 'w')
-        reader.write(os.getcwd())
-        reader.close()
 
 
 if __name__ == '__main__':

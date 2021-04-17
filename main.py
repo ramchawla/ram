@@ -16,32 +16,11 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 import process
-from exceptions import RamInstallException
-
-
-def run_command_line() -> str:
-    """ Run from the command line. """
-    try:
-        reader = open('store.txt', 'r')
-    except FileNotFoundError:
-        raise RamInstallException
-    else:
-        return reader.read().strip() + '/' + process.verify_file()
-
-
-def run_console() -> str:
-    """ Run from the console. """
-    to_run = input('Enter Ram file path (e.g. main.ram): ')
-    return process.verify_file(to_run)
 
 
 def main() -> None:
     """ Get command path and execute file """
-    if process.CALLED_FROM == 'command':
-        file_path = run_command_line()
-    else:
-        assert process.CALLED_FROM == 'console'
-        file_path = run_console()
+    file_path = process.verify_file()
 
     # parse the file and evaluate the module
     module = process.main_parser(file_path)

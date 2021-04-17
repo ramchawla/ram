@@ -13,12 +13,8 @@ Ariel Chouminov, Ramya Chawla.
 from typing import Union
 import enum
 
-try:
-    from parsing.parse_variables import parse_expression, parse_variable
-    from parsing.parse_numeric import lexify
-except ModuleNotFoundError:
-    from parse_variables import parse_expression, parse_variable
-    from parse_numeric import lexify
+from .parse_variables import parse_expression, parse_variable
+from .parse_numeric import lexify
 
 from syntaxtrees.abs import EmptyExpr, Statement, Expr
 from syntaxtrees.datatypes import Name, Num

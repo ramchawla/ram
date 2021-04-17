@@ -3,7 +3,8 @@ new function f takes (x,y) {
     send back z
 }
 
-set integer z to 1
+set integer z to f[x=45,y=43]
+display z
 
 loop with i from (2 + f[x=30,y=27]) to (10 - 2) {
     set integer y to z + i
