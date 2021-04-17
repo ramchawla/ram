@@ -19,7 +19,8 @@ from syntaxtrees.abs import Module
 
 from parsing.parsing import Block, Line
 
-from exceptions import RamFileException, RamFileNotFoundException
+from exceptions import RamFileException, RamFileNotFoundException, \
+    RamGeneralException, RamException
 
 
 def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
@@ -133,14 +134,19 @@ def main_parser(file_path: str) -> Module:
     """ Take in file_path and process the code.
         Parse each line/block in the file and return a Module.
     """
-    code = read_file_as_list(file_path)
+    try:
+        code = read_file_as_list(file_path)
 
-    statements = []
+        statements = []
 
-    for item in code:
-        statements.append(item.parse())
+        for item in code:
+            statements.append(item.parse())
 
-    return Module(statements)
+        return Module(statements)
+    except Exception as e:
+        if isinstance(e, RamException):
+            raise e
+        raise RamGeneralException(str(e))
 
 
 def verify_file(file_name=None) -> str:
