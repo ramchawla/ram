@@ -10,7 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from typing import Union
+from typing import Any, Union
 import enum
 
 from .parse_variables import parse_expression, parse_variable
@@ -173,7 +173,7 @@ class Block:
         self.__class__ = parsed_block.__class__
         self.__dict__ = parsed_block.__dict__
 
-    def evaluate_line(self):
+    def evaluate_line(self) -> None:
         """ Parse all children blocks and/or lines """
         created_index = []
         self.contents = []
@@ -196,7 +196,7 @@ class Block:
                 else:
                     self.contents.append(item.parse())
 
-    def make_child(self, **kwargs):
+    def make_child(self, **kwargs) -> Any:
         """ Create new block subclass based on parent type
         """
         if self.child_type is None:
@@ -218,7 +218,10 @@ class Block:
 
 
 class LoopBlock(Block):
-    def __init__(self, **kwargs):
+    """ A block of Ram code to parse,
+        that evaluates to a loop
+    """
+    def __init__(self, **kwargs) -> None:
         if 'keyword' not in kwargs or 'block' not in kwargs:
             raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
@@ -256,7 +259,10 @@ class LoopBlock(Block):
 
 
 class FunctionBlock(Block):
-    def __init__(self, **kwargs):
+    """ A block of Ram code to parse,
+        that evaluates to a Function
+    """
+    def __init__(self, **kwargs) -> None:
         if 'keyword' not in kwargs or 'block' not in kwargs:
             raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
@@ -294,7 +300,10 @@ class FunctionBlock(Block):
 
 
 class IfBlock(Block):
-    def __init__(self, **kwargs):
+    """ A block of Ram code to parse,
+        That evaluates to a If
+    """
+    def __init__(self, **kwargs) -> None:
         if 'keyword' not in kwargs or 'block' not in kwargs:
             raise RamBlockException('Undefined block created')
         self.block = kwargs.get('block')
