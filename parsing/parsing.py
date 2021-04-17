@@ -28,7 +28,8 @@ VAR_TYPES = ('integer', 'text')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
 
 
-class BLOCK_ENUMS(enum.Enum):
+class BlockEnums(enum.Enum):
+    """New Block variable"""
     LoopType = 'loop'
     IfType = 'if'
     FunctionType = 'new'
@@ -156,13 +157,13 @@ class Block:
 
         if self.keyword == 'loop':
             # TODO: Add doc
-            self.child_type = BLOCK_ENUMS.LoopType
+            self.child_type = BlockEnums.LoopType
         elif self.keyword == 'new':
             # TODO: Add doc
-            self.child_type = BLOCK_ENUMS.FunctionType
+            self.child_type = BlockEnums.FunctionType
         elif self.keyword == 'if':
             # TODO: Add doc
-            self.child_type = BLOCK_ENUMS.IfType
+            self.child_type = BlockEnums.IfType
         else:
             # keyword not recognized
             raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
@@ -197,11 +198,11 @@ class Block:
         if self.child_type is None:
             raise RamSyntaxKeywordException(self.block[0][0], self.block[0][1], self.keyword)
 
-        if self.child_type == BLOCK_ENUMS.LoopType:
+        if self.child_type == BlockEnums.LoopType:
             return LoopBlock(**kwargs)
-        elif self.child_type == BLOCK_ENUMS.IfType:
+        elif self.child_type == BlockEnums.IfType:
             return IfBlock(**kwargs)
-        elif self.child_type == BLOCK_ENUMS.FunctionType:
+        elif self.child_type == BlockEnums.FunctionType:
             return FunctionBlock(**kwargs)
 
     def parse(self) -> Statement:

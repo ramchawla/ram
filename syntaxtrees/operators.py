@@ -53,7 +53,6 @@ class BinOp(Expr):
         left_val = self.left.evaluate(env)
         right_val = self.right.evaluate(env)
 
-
         if self.op == '+':
             return left_val + right_val
         elif self.op == '*':
