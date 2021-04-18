@@ -290,7 +290,8 @@ class FunctionBlock(Block):
             # get the name of the function and the return expression and return Function
             function_name = header_list[2]
             if isinstance(self.block[-2], Line) and 'send' in self.block[-2].line:
-                rturn_expr = parse_return(self.block[-2].line, line_number, self.block[-2].line.split())
+                rturn_expr = parse_return(self.block[-2].line,
+                                          line_number, self.block[-2].line.split())
                 self.contents[0].pop()
             else:
                 rturn_expr = EmptyExpr()
@@ -348,7 +349,8 @@ class IfBlock(Block):
                 new_block = self.block[else_index:]
                 x = new_block[0][0].replace("} else ", "")
                 new_block[0] = (x, new_block[0][1])
-                return If([(expression, if_actions)], [IfBlock(block=new_block, keyword='if').parse()])
+                return If([(expression, if_actions)], [IfBlock(block=new_block,
+                                                               keyword='if').parse()])
             else:
                 for action in self.block[else_index + 1:]:
                     if isinstance(action, tuple):
