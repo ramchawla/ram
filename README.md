@@ -4,7 +4,7 @@ Ram is a programming language created using Abstract Syntax Trees in Python. A f
 
 ## Installation
 
-This program can be run simply by running the [main.py](https://github.com/willassad/ram/blob/main/main.py) file. However, on mac the program can also be run in terminal. First, run the command:
+This program can be run simply by running the [main.py](https://github.com/willassad/ram/blob/main/main.py) file. However, on mac, the program can also be run in terminal. First, run the command:
 
 ```zsh
 ~ % which python
