@@ -20,7 +20,7 @@ from syntaxtrees.operators import BinOp, BoolOp, BoolEq
 from syntaxtrees.statements import Assign
 
 # Globals
-VAR_TYPES = ('integer', 'text')
+VAR_TYPES = ('integer', 'text', 'boolean')
 OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and', 'is')
 
 
@@ -38,7 +38,7 @@ def parse_variable(line: str, number: int, var_type: str, to_assign: list[str]) 
     elif to_assign[1] != 'to':
         raise RamSyntaxKeywordException(line, number, to_assign[1])
 
-    if var_type == 'integer' or var_type == 'text':
+    if var_type == 'integer' or var_type == 'text' or var_type == 'boolean':
         # parse an integer or string assignment statement
         return parse_assign(line, number, to_assign[0], to_assign[2:])
     else:
@@ -125,8 +125,8 @@ def handle_multiple_values(line: str, number: int, values: list,
     elif next_val in {'or', 'and'}:
         # create BoolOp around operator next_val
         expression_so_far = BoolOp(
-            val, [parse_expression(line, number, values[0:1]),
-                  parse_expression(line, number, values[2:])])
+            next_val, [parse_expression(line, number, values[0:1]),
+                       parse_expression(line, number, values[2:])])
     elif next_val == 'is':
         # create BoolEq around operator
         expression_so_far = BoolEq(parse_expression(line, number, values[0:1]),

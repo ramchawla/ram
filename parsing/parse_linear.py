@@ -78,7 +78,13 @@ def lexify(line: str) -> list[Union[str, list]]:
        ['5', '+', ['9', '*', '2'], '-', '3']
        >>> lexify('14 - (2 + (7 / (4 + 1) - 15) + (3 * 4))')
        ['14', '-', ['2', '+', ['7', '/', ['4', '+', '1'], '-', '15'], '+', ['3', '*', '4']]]
+       >>> lexify('true or false and true')
+       [['true', 'or', 'false'], 'and', 'true']
     """
+    #if 'or' in line.split() or 'and' in line.split():
+    #    return lexbool(line.split())
+
+    line = format_whitespace(line)
     blocks = identify_bracket_blocks(line)
     lexed_so_far = []
 
@@ -94,17 +100,23 @@ def lexify(line: str) -> list[Union[str, list]]:
             else:
                 end_index = 1 + 2 * ((len(to_add) - 1) // 2)
 
-            lexed_so_far.extend(pedmas(to_add[:end_index]) + to_add[end_index:])
+            if 'and' in to_add[:end_index] or 'or' in to_add[:end_index]:
+                lexed_so_far.extend(lexbool(to_add[:end_index]) + to_add[end_index:])
+            else:
+                lexed_so_far.extend(pedmas(to_add[:end_index]) + to_add[end_index:])
 
     return lexed_so_far
 
 
-def format_whitespace(text: str) -> str:
+def format_whitespace(text: str) -> Union[str, list]:
     """ Insert whitespace around operators.
 
     >>> format_whitespace('(7/(4 +1)- 15)')
     '(7 / (4 + 1) - 15)'
     """
+    if 'and' in text.split() or 'or' in text.split():
+        return text
+
     new_text = ''
 
     for char in text.replace(' ', ''):
@@ -114,6 +126,25 @@ def format_whitespace(text: str) -> str:
             new_text += char
 
     return new_text
+
+
+def lexbool(expression: list[Union[str, list]]) -> list[Union[str, list]]:
+    """ Lexify a split boolean expression.
+
+        Precondition:
+         - len(expression) >= 3
+
+    >>> lexbool(['true', 'or', 'false', 'and', 'true'])
+    [['true', 'or', 'false'], 'and', 'true']
+    >>> lexbool(['true', 'and', 'true'])
+    ['true', 'and', 'true']
+    >>> lexbool(['true', 'or', 'false', 'or', 'false', 'and', 'true'])
+    [[['true', 'or', 'false'], 'or', 'false'], 'and', 'true']
+    """
+    if len(expression) == 3:
+        return expression
+    else:
+        return lexbool([expression[:3]] + expression[3:])
 
 
 def identify_bracket_blocks(text: str) -> list[str]:

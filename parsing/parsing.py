@@ -13,8 +13,12 @@ Ariel Chouminov, Ramya Chawla.
 from typing import Any
 import enum
 
-from .parse_variables import parse_expression, parse_variable
-from .parse_numeric import lexify
+try:
+    from .parse_variables import parse_expression, parse_variable
+    from .parse_linear import lexify
+except ImportError:
+    from parse_variables import parse_expression, parse_variable
+    from parse_linear import lexify
 
 from syntaxtrees.abs import EmptyExpr, Statement, Expr
 from syntaxtrees.statements import Display, Function, Loop, If
@@ -40,6 +44,7 @@ def get_line_as_list(line: str, number: int) -> list[str]:
     ['set', 'integer', 'var1', 'to', ['10', '+', '5']]
     >>> get_line_as_list('display 10 + 5', 44)
     ['display', ['10', '+', '5']]
+    >>> get_line_as_list('display true or false')
     """
     split_list = line.split()
     if len(split_list) < 2:
