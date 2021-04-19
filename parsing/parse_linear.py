@@ -33,8 +33,7 @@ def pedmas(sequence: list[str]) -> list[Union[str, list]]:
        >>> pedmas(['3', '-', 'y', '-', '4', '+', '2'])
        [[[['3', '-', 'y'], '-', '4'], '+', '2']]
     """
-    count1 = 0
-    count2 = 0
+    count1, count2 = 0, 0
     for i in sequence:
         if i == "*" or i == '/':
             count1 += 1
@@ -53,7 +52,7 @@ def pedmas_helper(sequence: list[str], d: int, operation_1: str, operation_2: st
     else:
         lst = []
         for index in range(len(sequence) - 1):
-            # lets assume the operation will have another element to the right of it most definetely
+            # Assume the operation will have another element to the right of it.
             if sequence[index + 1] == operation_1 or sequence[index + 1] == operation_2:
                 temp_lst = [sequence[index], sequence[index + 1], sequence[index + 2]]
                 lst.append(temp_lst)
@@ -81,9 +80,7 @@ def lexify(line: str) -> list[Union[str, list]]:
        >>> lexify('true or false and true')
        [['true', 'or', 'false'], 'and', 'true']
     """
-    #if 'or' in line.split() or 'and' in line.split():
-    #    return lexbool(line.split())
-
+    # format whitespace around binary operators
     line = format_whitespace(line)
     blocks = identify_bracket_blocks(line)
     lexed_so_far = []

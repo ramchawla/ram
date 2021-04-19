@@ -35,7 +35,6 @@ class RamSyntaxKeywordException(RamSyntaxException):
 
 class RamSyntaxOperatorException(RamSyntaxException):
     """Keyword Syntax Exception."""
-
     def __init__(self, line: str, line_number: int, foreign: str) -> None:
         RamSyntaxException.__init__(self, line, line_number, f'Operator \'{foreign}\' invalid.')
 

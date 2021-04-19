@@ -1,9 +1,11 @@
+% Example of a function with no return
 new function equals takes (x,y) {
     if (x) is (y) {
         display "They are Equal!"
     }
 }
 
+% Example of a function with parameter and return
 new function compute takes (number) {
     if (number + 2) is 40 {
         set integer z to number - 5
@@ -15,3 +17,7 @@ new function compute takes (number) {
 
     send back z
 }
+
+% call the function compute
+set integer result to compute[number=38]
+display result

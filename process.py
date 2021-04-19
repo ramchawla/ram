@@ -5,6 +5,7 @@ This module determines whether ram is being run in
 the console or the command line and verifies the ram
 file is in the correct format and exists. It then creates
 a nested structure of the code in the file using Block.
+
 Copyright and Usage Information
 ===============================
 All forms of distribution of this code, whether as given or with any changes,
@@ -16,7 +17,6 @@ import sys
 from typing import Union
 
 from syntaxtrees.abs import Module
-
 from parsing.parsing import Block, Line
 
 from exceptions import RamFileException, RamFileNotFoundException, \
@@ -83,23 +83,16 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         ('}', 10) ]]
     """
     visited = []
-    # Truncate empty lines
-    file_lines_2 = [line for line in file_lines if line[0] != ""]
-    file_lines_3 = []
 
-    # Recount line numbers after removing empty lines
-    for line_index in range(0, len(file_lines_2)):
-        file_lines_3.append((file_lines_2[line_index][0], line_index + 1))
-
-    # Recursively parse through each tuple
-    lst = helper_func(file_lines_3, 1, visited)[0]
+    # Truncate empty lines and lines with comments
+    file_lines_2 = [line for line in file_lines if line[0] != '' and line[0][0] != '%']
+    lst = create_blocks(file_lines_2, 1, visited)[0]
 
     return lst
 
 
-def helper_func(file_lines, line_number, visited: list):
-    """ Parses lines into blocks that hold each line's
-        child 
+def create_blocks(file_lines, line_number, visited: list):
+    """ Parses lines into blocks that hold each line's child
     """
     contents = []
 
@@ -113,7 +106,7 @@ def helper_func(file_lines, line_number, visited: list):
                     continue
 
                 block = Block([(file_lines[line_index][0], file_lines[line_index][1])])
-                block.contents, visited = helper_func(file_lines, line_index + 1, visited)
+                block.contents, visited = create_blocks(file_lines, line_index + 1, visited)
                 block.block += block.contents
                 block.evaluate_line()
                 contents.append(block)
@@ -134,16 +127,18 @@ def main_parser(file_path: str) -> Module:
     """ Take in file_path and process the code.
         Parse each line/block in the file and return a Module.
     """
+    # attempt to parse code
     try:
         code = read_file_as_list(file_path)
-
         statements = []
 
+        # parse each Block and Line in code
         for item in code:
             statements.append(item.parse())
 
         return Module(statements)
     except Exception as e:
+        # raise known RamException
         if isinstance(e, RamException):
             raise e
         raise RamGeneralException(str(e))
@@ -154,18 +149,21 @@ def verify_file(file_name=None) -> str:
         file extension .ram and return the file name if valid
     """
     try:
+        # get the file name from command line
         if file_name is None:
             file_name = sys.argv[1]
     except IndexError:
-        print('Need File Name to be Run e.g \'ram main.ram\'')
-        in_file = input("Enter file path: ")
-        return verify_file(in_file)
+        print('Need File Name to be Run, e.g \'main.ram\'')
+        return verify_file(input("Enter file path: "))
 
     if '.' not in file_name:
+        # file name does not contain an extension
         raise RamFileException(f'Invalid file name \'{file_name}\', no extension specified.')
     elif file_name.count('.') > 1:
+        # file name has unknown format
         raise RamFileException(f'Invalid file name \'{file_name}\'')
     elif (extension := file_name[len(file_name) - file_name[::-1].index('.') - 1:]) != '.ram':
+        # extension is not .ram
         raise RamFileException(f'File extension \'{extension}\' not recognised.')
 
     return file_name
