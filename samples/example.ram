@@ -1,24 +1,29 @@
 % this is an example Ram file
+% blank lines as well as these comments are not parsed
 
+% numeric expressions can have strange spacing
 set integer var1 to 30 + (45 *(15 /3)) - 2
 
 % variable is set to true here
 set boolean variable to true or false
 
-% display the complex nested boolean expression
+% this prints a complex nested boolean expression
 display variable and true and false and (false or (false and true))
-
 display var1
 
-loop with j from (245) to (var1) {
+% here is a nested loop
+loop with j from (var1) to (var1 + 4) {
     loop with k from (1) to (2) {
         display j + k
     }
 }
 
+% reset is the same as set, but adds more clarity
 reset integer var1 to var1 - 3
 
+% this is a complicated nested if statement
 if (var1) is (0) {
+    % here is a comment within a block
     display "The End"
 } else if (var1) is (15) {
     display "Hello World!"
@@ -28,6 +33,7 @@ if (var1) is (0) {
     display "The variable is:"
     display var1
 
+    % nesting an if statement
     if (var1) is (249+1) {
         display "HOLY"
     } else {

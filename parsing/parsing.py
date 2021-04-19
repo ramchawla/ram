@@ -282,7 +282,8 @@ class FunctionBlock(Block):
         header_list = self.header.split()
         if len(header_list) != 5:
             # function statement not in correct form, cannot parse.
-            raise RamSyntaxException(self.header, line_number, 'Function header cannot be parsed.')
+            raise RamSyntaxException(self.header, line_number,
+                                     'Function header cannot be parsed.')
         if header_list[1] != 'function':
             raise RamSyntaxKeywordException(self.header, line_number, header_list[1])
         elif header_list[3] != 'takes':
@@ -300,6 +301,7 @@ class FunctionBlock(Block):
                 self.contents[0].pop()
             else:
                 rturn_expr = EmptyExpr()
+
             return Function(function_name, param_names, self.contents[0], rturn_expr)
 
 
@@ -325,25 +327,25 @@ class IfBlock(Block):
         header_line = self.header.split()
         expression_normal = self.header.replace("if ", "").split('is')
         expression_left = lexify(expression_normal[0])
+
         if len(expression_normal) > 1:
             expression_right = lexify(expression_normal[1])
             expression_normal = expression_left + ['is'] + expression_right
         else:
             expression_normal = expression_left
-        expression = parse_expression('', 0, expression_normal)
 
-        else_exists = False
-        else_item = None
-        else_index = 0
-        if_actions = []
-        actions = []
+        expression = parse_expression(header_line, line_number, expression_normal)
+
+        else_exists, else_item, else_index = False, None, 0
+        if_actions, actions = [], []
+
         for i in range(1, len(self.block)):
             if isinstance(self.block[i], tuple):
-                else_exists = True
-                else_item = self.block[i]
-                else_index = i
+                else_exists, else_item, else_index = True, self.block[i], i
                 break
+
             if_actions.append(self.block[i].parse())
+
         if else_exists:
             if 'if' in else_item[0]:
                 item_split = else_item[0].split()
@@ -361,6 +363,7 @@ class IfBlock(Block):
                     if isinstance(action, tuple):
                         break
                     actions.append(action.parse())
+
         return If([(expression, if_actions)], actions)
 
 

@@ -1,17 +1,22 @@
 % Example of a function with no return
 new function equals takes (x,y) {
     if (x) is (y) {
-        display "They are Equal!"
+        display "They are equal!"
+    } else {
+        display "They are not equal."
     }
 }
 
 % Example of a function with parameter and return
 new function compute takes (number) {
+    % initialise variable z
+    set integer z to 0
+
     if (number + 2) is 40 {
-        set integer z to number - 5
+        reset integer z to number - 5
     } else {
         loop with i from (1) to (number) {
-            set integer z to i
+            reset integer z to i
         }
     }
 
@@ -19,5 +24,7 @@ new function compute takes (number) {
 }
 
 % call the function compute
-set integer result to compute[number=38]
-display result
+set integer result_one to compute[number=38]
+set integer result_two to compute[number=33]
+
+display equals[x=5,y=4]
