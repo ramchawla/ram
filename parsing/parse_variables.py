@@ -78,9 +78,6 @@ def parse_expression(line: str, number: int, values: list) -> Expr:
     >>> exp.evaluate({})
     12.0
     """
-    # build up the expression recursively
-    expression_so_far = EmptyExpr()
-
     # verify that every other value is a recognized operator
     proceed = verify_keywords(values)
 
@@ -89,54 +86,40 @@ def parse_expression(line: str, number: int, values: list) -> Expr:
         raise RamSyntaxOperatorException(line, number, proceed)
     elif values == []:
         # Base case: values is empty
-        return expression_so_far
+        return EmptyExpr()
+    elif len(values) == 1 and isinstance(values[0], list):
+        # Values is a list containing one list and must recurse
+        return parse_expression(line, number, values[0])
     elif len(values) == 1:
-        # Looking at a single value to parse such as String, Num, Name
-        expression_so_far = handle_single_value(line, number, values)
+        # Looking at a single value such as String, Num, Boolean, Name
+        return get_expression_single_value(values[0])
     else:
         # Parse multiple values recursively
-        expression_so_far = handle_multiple_values(line, number, values,
-                                                   expression_so_far)
-
-    # return final expression
-    return expression_so_far
+        return handle_multiple_values(line, number, values)
 
 
-def handle_single_value(line: str, number: int, values: list) -> Expr:
+def handle_multiple_values(line: str, number: int, values: list) -> Expr:
     """Return a parsed expression of a single value in values. """
-    if isinstance(values[0], list):
-        # single value is a list and must be parsed recursively.
-        return parse_expression(line, number, values[0])
-    else:
-        # single value is an expression and can be returned.
-        return get_expression_single_value(values[0])
+    operator = values[1]  # prepare for operator
 
-
-def handle_multiple_values(line: str, number: int, values: list,
-                           expression: Expr) -> Expr:
-    """Return a parsed expression of a single value in values. """
-    val, next_val = values[0], values[1]  # prepare for operator
-
-    if next_val in {'*', '/', '+', '-'}:
+    if operator in {'*', '/', '+', '-'}:
         # create BinOp around operator next_val
-        expression_so_far = BinOp(
-            parse_expression(line, number, values[0:1]), next_val,
+        return BinOp(
+            parse_expression(line, number, values[0:1]), operator,
             parse_expression(line, number, values[2:]))
-    elif next_val in {'or', 'and'}:
+    elif operator in {'or', 'and'}:
         # create BoolOp around operator next_val
-        expression_so_far = BoolOp(
-            next_val, [parse_expression(line, number, values[0:1]),
+        return BoolOp(
+            operator, [parse_expression(line, number, values[0:1]),
                        parse_expression(line, number, values[2:])])
-    elif next_val == 'is':
+    elif operator == 'is':
         # create BoolEq around operator
-        expression_so_far = BoolEq(parse_expression(line, number, values[0:1]),
-                                   parse_expression(line, number, values[2:]))
+        return BoolEq(parse_expression(line, number, values[0:1]),
+                      parse_expression(line, number, values[2:]))
     else:
         # next_val not in OPERATORS. This branch should not be
         # entered given verify_keywords has been called on values.
-        raise RamSyntaxOperatorException(line, number, next_val)
-
-    return expression_so_far
+        raise RamSyntaxOperatorException(line, number, operator)
 
 
 def verify_keywords(values: list[Union[str, list]]) -> Union[bool, str]:
