@@ -14,7 +14,7 @@ Ariel Chouminov, Ramya Chawla.
 
 from typing import Union
 
-from parse_linear import lexify
+from .parse_linear import lexify
 from syntaxtrees.abs import EmptyExpr, Expr
 from syntaxtrees.datatypes import Bool, Input, Name, Num, String
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
