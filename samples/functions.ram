@@ -1,10 +1,12 @@
 % Example of a function with no return
 new function equals takes (x,y) {
     if (x) is (y) {
-        display "They are equal!"
+        set boolean result to true
     } else {
-        display "They are not equal."
+        set boolean result to false
     }
+
+    send back result
 }
 
 % Example of a function with parameter and return
@@ -23,8 +25,22 @@ new function compute takes (number) {
     send back z
 }
 
+
+% example of a function with no parameters
+new function celebration takes (none) {
+    % celebrate something
+    display "HOORAY!"
+    display "This is a celebration!"
+}
+
+
 % call the function compute
 set integer result_one to compute[number=38]
 set integer result_two to compute[number=33]
 
-display equals[x=5,y=4]
+% check if the results are equal
+if equals[x=result_one,y=result_two] {
+    call celebration[none=0]
+} else {
+    display "They are not equal."
+}

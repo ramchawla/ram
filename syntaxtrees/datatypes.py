@@ -11,7 +11,10 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from .abs import Expr
+try:
+    from .abs import Expr
+except ImportError:
+    from abs import Expr
 
 from typing import Any, Optional, Union
 
@@ -135,15 +138,13 @@ class Name(Expr):
         self.arguments = arguments
 
     def evaluate(self, env: dict[str, Any]) -> Any:
-        """Return the *value* of this expression using the given variable environment.
-
-        >>> from statements import Function, Assign
-        >>> from operators import BinOp
-        """
+        """Return the *value* of this expression using the given variable environment. """
         if self.id in env:
             if callable(env[self.id]):
                 # self.id references a function
-                return env[self.id](self.arguments)
+                local_env = {key: env[key] for key in env if key in
+                             [str(arg) for arg in self.arguments.values()]}
+                return env[self.id](self.arguments, local_env)
 
             # self.id references a variable
             return env[self.id]

@@ -10,7 +10,10 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from .abs import Expr
+try:
+    from .abs import Expr
+except ImportError:
+    from abs import Expr
 
 from typing import Any
 

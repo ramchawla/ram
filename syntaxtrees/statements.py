@@ -10,7 +10,10 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-from .abs import Expr, Statement
+try:
+    from .abs import Expr, Statement
+except ImportError:
+    from abs import Expr, Statement
 
 from typing import Any
 
@@ -254,7 +257,7 @@ class Function(Statement):
         return z
 
     We would create in instance of Function as follows:
-    >>> from datatypes import Name, String
+    >>> from datatypes import Name, String, Num
     >>> from operators import BinOp
     >>> env = {}
     >>> f = Function('f', ['x', 'y'],
@@ -280,12 +283,11 @@ class Function(Statement):
         self.body = body
         self.rturn = rturn
 
-    def call(self, params: dict[str, Expr]) -> Any:
+    def call(self, params: dict[str, Expr], local_env: dict[str, Expr]) -> Any:
         """ Precondition:
              - all(var in env for var in self.params)
         """
-
-        arguments = {arg_name: params[arg_name].evaluate({}) for arg_name in params}
+        arguments = {arg_name: params[arg_name].evaluate(local_env) for arg_name in params}
 
         for statement in self.body:
             statement.evaluate(arguments)

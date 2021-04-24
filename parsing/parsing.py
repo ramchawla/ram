@@ -59,7 +59,7 @@ def get_line_as_list(line: str, number: int) -> list[str]:
         # split into list of first 4 words and lexify the rest
         line_so_far = line.split()[:4]
         line_so_far += [lexify(' '.join(line.split()[4:]))]
-    elif keyword == 'display':
+    elif keyword == 'display' or keyword == 'call':
         # split into list of first word and lexify the rest
         line_so_far = line.split()[:1]
         line_so_far += [lexify(' '.join(line.split()[1:]))]
@@ -115,6 +115,9 @@ class Line:
         elif self.keyword == 'send':
             # function return statement
             return parse_return(self.line, len(self.strs), self.strs)
+        elif self.keyword == 'call':
+            # function call statement
+            return parse_expression(self.line, self.number, self.strs[1:])
         else:
             # keyword not recognized
             raise RamSyntaxKeywordException(self.line, self.number, self.keyword)
