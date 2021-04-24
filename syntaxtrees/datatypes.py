@@ -143,7 +143,7 @@ class Name(Expr):
             if callable(env[self.id]):
                 # self.id references a function
                 local_env = {key: env[key] for key in env if key in
-                             [str(arg) for arg in self.arguments.values()]}
+                             [str(arg) for arg in self.arguments.values()] or callable(env[key])}
                 return env[self.id](self.arguments, local_env)
 
             # self.id references a variable

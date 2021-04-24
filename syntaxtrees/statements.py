@@ -288,6 +288,7 @@ class Function(Statement):
              - all(var in env for var in self.params)
         """
         arguments = {arg_name: params[arg_name].evaluate(local_env) for arg_name in params}
+        arguments.update(local_env)
 
         for statement in self.body:
             statement.evaluate(arguments)

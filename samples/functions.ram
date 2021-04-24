@@ -1,3 +1,6 @@
+% THIS RAM PROGRAM ILLUSTRATES FUNCTION EXAMPLES
+
+
 % Example of a function with no return
 new function equals takes (x,y) {
     if (x) is (y) {
@@ -8,6 +11,7 @@ new function equals takes (x,y) {
 
     send back result
 }
+
 
 % Example of a function with parameter and return
 new function compute takes (number) {
@@ -34,13 +38,36 @@ new function celebration takes (none) {
 }
 
 
-% call the function compute
-set integer result_one to compute[number=38]
-set integer result_two to compute[number=33]
+% sample recursive function
+new function recurse_numbers takes (starting_number) {
+    if starting_number is 0 {
+        set integer return to starting_number
+    } else {
+        set integer x to starting_number - 1
+        set integer return to starting_number + recurse_numbers[starting_number=x]
+    }
 
-% check if the results are equal
-if equals[x=result_one,y=result_two] {
-    call celebration[none=0]
-} else {
-    display "They are not equal."
+    send back return
 }
+
+
+% example of main function
+new function main takes (none) {
+    % call the function compute
+    set integer result_one to compute[number=38]
+    set integer result_two to compute[number=33]
+
+    % check if the results are equal
+    if equals[x=result_one,y=result_two] {
+        call celebration[none=0]
+    } else {
+        display "They are not equal."
+    }
+
+    % call recursive function numbers
+    display recurse_numbers[starting_number=5]
+}
+
+
+% call the main function
+call main[none=0]
