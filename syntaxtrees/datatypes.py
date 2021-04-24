@@ -153,3 +153,22 @@ class Name(Expr):
 
     def __str__(self) -> str:
         return self.id
+
+
+class Input(Expr):
+    """ Input expression.
+
+        Representation Invariant:
+         - lexify and parser are the valid functions from parse_variables
+         - and parse_linear
+    """
+    lexify: callable
+    parser: callable
+
+    def __init__(self, lexify: callable, parser: callable) -> None:
+        self.lexify = lexify
+        self.parser = parser
+
+    def evaluate(self, env: dict[str, Any]):
+        """ Evaluate an input expression."""
+        return self.parser('', -1, self.lexify(input(''))).evaluate(env)

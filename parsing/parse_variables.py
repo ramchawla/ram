@@ -13,8 +13,10 @@ Ariel Chouminov, Ramya Chawla.
 """
 
 from typing import Union
+
+from parse_linear import lexify
 from syntaxtrees.abs import EmptyExpr, Expr
-from syntaxtrees.datatypes import Bool, Name, Num, String
+from syntaxtrees.datatypes import Bool, Input, Name, Num, String
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
 from syntaxtrees.operators import BinOp, BoolOp, BoolEq
 from syntaxtrees.statements import Assign
@@ -148,5 +150,7 @@ def get_expression_single_value(value: str) -> Expr:
             param_dict[param.split('=')[0]] = parse_expression('', 0, [param.split('=')[1]])
 
         return Name(value[:value.index('[')], param_dict)
+    elif value == 'GET_INPUT':
+        return Input(lexify, parse_expression)
     else:
         return Name(value)
