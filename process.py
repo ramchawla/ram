@@ -82,13 +82,9 @@ def process_ram(file_lines: list) -> list[Union[Line, Block]]:
         Line('display "Reset"', 7), ('}', 8)]), Line('display "Hello World!"', 9),
         ('}', 10) ]]
     """
-    visited = []
-
     # Truncate empty lines and lines with comments
     file_lines_2 = [line for line in file_lines if line[0] != '' and line[0][0] != '%']
-    lst = create_blocks(file_lines_2, 1, visited)[0]
-
-    return lst
+    return create_blocks(file_lines_2, 1, [])[0]
 
 
 def create_blocks(file_lines, line_number, visited: list):
@@ -116,7 +112,8 @@ def create_blocks(file_lines, line_number, visited: list):
                 contents.append(('}', file_lines[line_index][1]))
                 break
 
-            else:  # its a line
+            else:
+                # must create a Line
                 line = Line(file_lines[line_index][0], file_lines[line_index][1])
                 contents.append(line)
 

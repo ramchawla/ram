@@ -110,7 +110,8 @@ class If(Statement):
     evals: list[tuple[Expr, list[Statement]]]
     orelse: list[Statement]
 
-    def __init__(self, evals: list[tuple[Expr, list[Statement]]], orelse: list[Statement]) -> None:
+    def __init__(self, evals: list[tuple[Expr, list[Statement]]],
+                 orelse: list[Statement]) -> None:
         self.evals = evals
         self.orelse = orelse
 

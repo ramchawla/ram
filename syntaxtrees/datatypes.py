@@ -11,6 +11,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+from exceptions import RamNameException
 try:
     from .abs import Expr
 except ImportError:
@@ -149,7 +150,7 @@ class Name(Expr):
             # self.id references a variable
             return env[self.id]
         else:
-            raise NameError(f'Variable \'{self.id}\' not defined.')
+            raise RamNameException(self.id)
 
     def __str__(self) -> str:
         return self.id

@@ -5,9 +5,9 @@
 set integer var1 to 30 + (45 *(15 /3)) - 2
 
 % uncomment the next lines to get input from user
-display "Enter value for var1: "
+% display "Enter value for var1: "
 % reset integer var1 to GET_INPUT
-% display var1
+display var1
 
 % variable is set to true here
 set boolean variable to true or false
