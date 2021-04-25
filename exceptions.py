@@ -14,35 +14,37 @@ Ariel Chouminov, Ramya Chawla.
 
 class RamException(Exception):
     """Abstract Ram exception."""
-    def __init__(self, line: str, line_number: int, message=None) -> None:
-        if message is None:
+    def __init__(self, line=None, line_number=None, error=None) -> None:
+        if line is None or line_number is None:
+            super().__init__()
+        elif error is None:
             super().__init__(f'Line {line_number}: \'{line}\'')
         else:
-            super().__init__(f'Line {line_number}: \'{line}\' \n     {message}')
+            super().__init__(f'Line {line_number}: \'{line}\' \n     {error}')
 
 
 class RamSyntaxException(RamException):
     """Syntax Exception."""
-    def __init__(self, line: str, line_number: int, message=None) -> None:
-        RamException.__init__(self, line, line_number, message)
+    def __init__(self, message=None) -> None:
+        RamException.__init__(self, message)
 
 
 class RamSyntaxKeywordException(RamSyntaxException):
     """Keyword Syntax Exception."""
-    def __init__(self, line: str, line_number: int, foreign: str) -> None:
-        RamSyntaxException.__init__(self, line, line_number, f'Keyword \'{foreign}\' invalid.')
+    def __init__(self, foreign: str) -> None:
+        RamSyntaxException.__init__(self, f'Keyword \'{foreign}\' invalid.')
 
 
 class RamSyntaxOperatorException(RamSyntaxException):
     """Keyword Syntax Exception."""
-    def __init__(self, line: str, line_number: int, foreign: str) -> None:
-        RamSyntaxException.__init__(self, line, line_number, f'Operator \'{foreign}\' invalid.')
+    def __init__(self, foreign: str) -> None:
+        RamSyntaxException.__init__(self, f'Operator \'{foreign}\' invalid.')
 
 
 class RamNameException(RamException):
     """ Undefined variable exception. """
-    def __init__(self, line: str, line_number: int, foreign: str) -> None:
-        RamException.__init__(self, line, line_number, f'Variable \'{foreign}\' not defined.')
+    def __init__(self, foreign: str) -> None:
+        RamException.__init__(self, f'Variable \'{foreign}\' not defined.')
 
 
 class RamBlockException(Exception):

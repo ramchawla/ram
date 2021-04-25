@@ -40,12 +40,12 @@ def pedmas(sequence: list[str]) -> list[Union[str, list]]:
         if i == "+" or i == "-":
             count2 += 1
 
-    equation_1 = pedmas_helper(sequence, count1, '*', '/')
-    equation_2 = pedmas_helper(equation_1, count2, '+', '-')
+    equation_1 = pedmas_recurse(sequence, count1, '*', '/')
+    equation_2 = pedmas_recurse(equation_1, count2, '+', '-')
     return equation_2
 
 
-def pedmas_helper(sequence: list[str], d: int, operation_1: str, operation_2: str) -> list:
+def pedmas_recurse(sequence: list[str], d: int, operation_1: str, operation_2: str) -> list:
     """helper function for pedmas function"""
     if d == 0:
         return sequence
@@ -57,7 +57,7 @@ def pedmas_helper(sequence: list[str], d: int, operation_1: str, operation_2: st
                 temp_lst = [sequence[index], sequence[index + 1], sequence[index + 2]]
                 lst.append(temp_lst)
                 lst += sequence[index + 3:]  # will take everything after
-                return pedmas_helper(lst, d - 1, operation_1, operation_2)
+                return pedmas_recurse(lst, d - 1, operation_1, operation_2)
             else:
                 lst.append(sequence[index])
 

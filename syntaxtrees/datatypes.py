@@ -171,4 +171,4 @@ class Input(Expr):
 
     def evaluate(self, env: dict[str, Any]):
         """ Evaluate an input expression."""
-        return self.parser('', -1, self.lexify(input(''))).evaluate(env)
+        return self.parser(self.lexify(input(''))).evaluate(env)

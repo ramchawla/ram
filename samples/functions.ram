@@ -18,12 +18,8 @@ new function compute takes (number) {
     % initialise variable z
     set integer z to 0
 
-    if (number + 2) is 40 {
-        reset integer z to number - 5
-    } else {
-        loop with i from (1) to (number) {
-            reset integer z to i
-        }
+    loop with i from (1) to (number) {
+        reset integer z to i
     }
 
     send back z
@@ -33,7 +29,7 @@ new function compute takes (number) {
 % example of a function with no parameters
 new function celebration takes (none) {
     % celebrate something
-    display "HOORAY!"
+    display "HOORAY - They are Equal!"
     display "This is a celebration!"
 }
 
@@ -54,7 +50,7 @@ new function sum_numbers takes (starting_number) {
 % example of main function
 new function main takes (none) {
     % get user input for two values
-    display "Enter two values to compute: "
+    display "Enter two values to compare: "
     set integer result_one to compute[number=GET_INPUT]
     set integer result_two to compute[number=GET_INPUT]
 
