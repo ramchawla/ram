@@ -14,9 +14,9 @@ Ariel Chouminov, Ramya Chawla.
 
 class RamException(Exception):
     """Abstract Ram exception."""
-    def __init__(self, line=None, line_number=None, error=None) -> None:
+    def __init__(self, line=None, line_number=None, error='') -> None:
         if line is None or line_number is None:
-            super().__init__()
+            super().__init__(error)
         elif error is None:
             super().__init__(f'Line {line_number}: \'{line}\'')
         else:

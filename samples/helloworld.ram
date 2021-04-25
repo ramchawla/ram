@@ -1,2 +1,4 @@
+% A simple Ram hello world program.
+
 set text hello to "Hello World!"
 display hello
