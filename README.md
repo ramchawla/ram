@@ -1,6 +1,6 @@
 # Ram 
 
-Ram is a programming language created using Abstract Syntax Trees in Python. A full project description can be found in the [overview.pdf](https://github.com/willassad/ram/blob/main/overview.pdf) file.
+Ram is a programming language created using Abstract Syntax Trees in Python. A full project description can be found in the [review.pdf](https://github.com/willassad/ram/blob/main/review.pdf) file.
 
 ## Installation
 
@@ -39,4 +39,4 @@ You can write ram code and run the file using the command:
 
 ## Notes and License
 
-Details on Ram Syntax can be found in the [overview.pdf](https://github.com/willassad/ram/blob/main/overview.pdf) file. All forms of distribution of this code, whether as given or with any changes, are expressly prohibited. All files are Copyright &copy; 2021 Will Assad, Zain Lakhani, Ariel Chouminov, and Ramya Chawla.
+Details on Ram Syntax can be found in the [installation_guide.pdf](https://github.com/willassad/ram/blob/main/installation_guide.pdf) file. All forms of distribution of this code, whether as given or with any changes, are expressly prohibited. All files are Copyright &copy; 2021 Will Assad, Zain Lakhani, Ariel Chouminov, and Ramya Chawla.
