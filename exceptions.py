@@ -10,6 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+from typing import Any
 
 
 class RamException(Exception):
@@ -26,7 +27,7 @@ class RamException(Exception):
 class RamSyntaxException(RamException):
     """Syntax Exception."""
     def __init__(self, message=None) -> None:
-        RamException.__init__(self, message)
+        RamException.__init__(self, error=message)
 
 
 class RamSyntaxKeywordException(RamSyntaxException):
@@ -44,7 +45,13 @@ class RamSyntaxOperatorException(RamSyntaxException):
 class RamNameException(RamException):
     """ Undefined variable exception. """
     def __init__(self, foreign: str) -> None:
-        RamException.__init__(self, f'Variable \'{foreign}\' not defined.')
+        RamException.__init__(self, error=f'Variable \'{foreign}\' not defined.')
+
+
+class RamOperatorEvaluateException(RamException):
+    """ Equivalent to python TypeError. """
+    def __init__(self, one: Any, op: str, two: Any) -> None:
+        RamException.__init__(self, error=f'Cannot perform operation \'{one} {op} {two}\'')
 
 
 class RamBlockException(Exception):

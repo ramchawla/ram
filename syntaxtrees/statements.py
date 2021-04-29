@@ -10,6 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+import verify
 try:
     from .abs import Expr, Statement
 except ImportError:
@@ -79,7 +80,12 @@ class Display(Statement):
         prints it. Note that it doesn't return anything, since `print` doesn't
         return anything.
         """
-        print(self.argument.evaluate(env))
+        value = self.argument.evaluate(env)
+
+        if verify.is_zero_float(value):
+            print(round(value))
+        else:
+            print(value)
 
     def __str__(self) -> str:
         """String representation of display"""
@@ -224,13 +230,13 @@ class Loop(Statement):
         5
         """
         # 1. Evaluate start and stop
-        start_val = int(self.start.evaluate(env))
-        stop_val = int(self.stop.evaluate(env))
+        start_val = round(self.start.evaluate(env))
+        stop_val = round(self.stop.evaluate(env))
 
         # 2. Execute the body once for each number between start and stop - 1
         for i in range(start_val, stop_val + 1):
             # assign self.target to i in the variable environment env
-            env[self.target] = i
+            env[self.target] = float(i)
 
             for statement in self.body:
                 if isinstance(statement, list):

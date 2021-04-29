@@ -10,6 +10,8 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+import verify
+from exceptions import RamOperatorEvaluateException
 try:
     from .abs import Expr
 except ImportError:
@@ -55,6 +57,12 @@ class BinOp(Expr):
         """
         left_val = self.left.evaluate(env)
         right_val = self.right.evaluate(env)
+
+        if not verify.is_numeric_number(left_val) or not verify.is_numeric_number(right_val):
+            # cannot perform operation
+            raise RamOperatorEvaluateException(left_val, self.op, right_val)
+        else:
+            left_val, right_val = float(left_val), float(right_val)
 
         if self.op == '+':
             return left_val + right_val
@@ -145,9 +153,9 @@ class BoolEq(Expr):
     def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
-        >>> from datatypes import Num
-        >>> exp = BoolEq(BinOp(Num(2), '+', Num(3)), BinOp(Num(8), '-', Num(3)))
-        >>> exp.evaluate({})
+        >>> from datatypes import Num, Name
+        >>> exp = BoolEq(BinOp(Num(2), '+', Name('x')), BinOp(Num(8), '-', Name('x')))
+        >>> exp.evaluate({'x': 3.0})
         True
         """
         return self.value1.evaluate(env) == self.value2.evaluate(env)

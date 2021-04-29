@@ -13,7 +13,7 @@ Ariel Chouminov, Ramya Chawla.
 """
 from typing import Union
 
-OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and')
+OPERATORS = ('+', '-', '/', '*', 'not', 'or', 'and', 'is')
 
 
 def pedmas(sequence: list[str]) -> list[Union[str, list]]:

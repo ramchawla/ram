@@ -13,14 +13,12 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
-import sys
 from typing import Union
 
 from syntaxtrees.abs import Module
 from parsing.parsing import Block, Line
 
-from exceptions import RamFileException, RamFileNotFoundException, \
-    RamGeneralException, RamException
+from exceptions import RamFileNotFoundException, RamGeneralException, RamException
 
 
 def read_file_as_list(file_path: str) -> list[Union[Line, Block]]:
@@ -139,28 +137,3 @@ def main_parser(file_path: str) -> Module:
         if isinstance(e, RamException):
             raise e
         raise RamGeneralException(str(e))
-
-
-def verify_file(file_name=None) -> str:
-    """ Verify that the file being run exists and has correct
-        file extension .ram and return the file name if valid
-    """
-    try:
-        # get the file name from command line
-        if file_name is None:
-            file_name = sys.argv[1]
-    except IndexError:
-        print('Need File Name to be Run, e.g \'main.ram\'')
-        return verify_file(input("Enter file path: "))
-
-    if '.' not in file_name:
-        # file name does not contain an extension
-        raise RamFileException(f'Invalid file name \'{file_name}\', no extension specified.')
-    elif file_name.count('.') > 1:
-        # file name has unknown format
-        raise RamFileException(f'Invalid file name \'{file_name}\'')
-    elif (extension := file_name[len(file_name) - file_name[::-1].index('.') - 1:]) != '.ram':
-        # extension is not .ram
-        raise RamFileException(f'File extension \'{extension}\' not recognised.')
-
-    return file_name

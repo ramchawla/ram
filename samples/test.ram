@@ -1,11 +1,13 @@
-set integer x to 5 * 3 + (4 * 7)
+display "Enter some number:"
+set integer x to GET_NUMBER
 
-if (x) is (5) {
-    display "Here"
+
+if x is 5 {
+    display "You entered 5."
 } else {
-    display "We might be here."
+    display "You did not enter 5."
 }
 
-loop with k from (1 * 4 - 3) to (x) {
-    display k - 2
+loop with k from (2 * 2 - 3.2) to (x) {
+    display k
 }

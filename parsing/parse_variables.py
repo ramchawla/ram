@@ -12,7 +12,7 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 
-from typing import Union
+import verify
 
 try:
     from .parse_linear import lexify
@@ -20,7 +20,7 @@ except ImportError:
     from parse_linear import lexify
 
 from syntaxtrees.abs import EmptyExpr, Expr
-from syntaxtrees.datatypes import Bool, Input, Name, Num, String
+from syntaxtrees.datatypes import Bool, InputNumber, InputText, Name, Num, String
 from exceptions import RamSyntaxException, RamSyntaxKeywordException, RamSyntaxOperatorException
 from syntaxtrees.operators import BinOp, BoolOp, BoolEq
 from syntaxtrees.statements import Assign
@@ -74,18 +74,18 @@ def parse_expression(values: list) -> Expr:
     Otherwise, values = ['5', '-', '4', '*', '3', '/', '2'] will be interpreted as:
     5 - (4 * (3 / 2))
 
-    >>> parse_expression('', ['5', '+', '6', '-', '2']).evaluate({})
+    >>> parse_expression(['5', '+', '6', '-', '2']).evaluate({})
     9
-    >>> parse_expression('', ['x', 'or', 'true']).evaluate({'x': False})
+    >>> parse_expression(['x', 'or', 'true']).evaluate({'x': False})
     True
-    >>> exp = parse_expression('', ['5', '+', [['6', '-', '2'], '+', '3']])
+    >>> exp = parse_expression(['5', '+', [['6', '-', '2'], '+', '3']])
     >>> str(exp)
     '(5.0 + ((6.0 - 2.0) + 3.0))'
     >>> exp.evaluate({})
     12.0
     """
     # verify that every other value is a recognized operator
-    proceed = verify_keywords(values)
+    proceed = verify.verify_keywords(OPERATORS, values)
 
     if proceed is not True:
         # invalid keyword, abort parsing
@@ -128,19 +128,9 @@ def handle_multiple_values(values: list) -> Expr:
         raise RamSyntaxOperatorException(operator)
 
 
-def verify_keywords(values: list[Union[str, list]]) -> Union[bool, str]:
-    """ Verify that every other item in values is a recognized
-        operator in OPERATORS. """
-    for i in range(len(values)):
-        if i % 2 == 1 and values[i] not in OPERATORS:
-            return values[i]
-
-    return True
-
-
 def get_expression_single_value(value: str) -> Expr:
     """ Get the expression that represents a single value. """
-    if value.isdigit():
+    if verify.is_number(value):
         return Num(float(value))
     elif value == 'true' or value == 'false':
         return Bool(value == 'true')
@@ -154,7 +144,9 @@ def get_expression_single_value(value: str) -> Expr:
             param_dict[param.split('=')[0]] = parse_expression([param.split('=')[1]])
 
         return Name(value[:value.index('[')], param_dict)
-    elif value == 'GET_INPUT':
-        return Input(lexify, parse_expression)
+    elif value == 'GET_NUMBER':
+        return InputNumber(lexify, parse_expression)
+    elif value == 'GET_TEXT':
+        return InputText()
     else:
         return Name(value)

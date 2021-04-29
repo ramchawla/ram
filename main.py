@@ -16,11 +16,12 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 import process
+import verify
 
 
 def main() -> None:
     """ Get command path and execute file """
-    file_path = process.verify_file()
+    file_path = verify.verify_file()
 
     # parse the file and evaluate the module
     module = process.main_parser(file_path)
