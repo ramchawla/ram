@@ -1,6 +1,6 @@
 # Ram 
 
-Ram is a programming language created using Abstract Syntax Trees in Python. A full project description can be found in the [review.pdf](https://github.com/willassad/ram/blob/main/review.pdf) file.
+Ram is a programming language created using Abstract Syntax Trees in Python.
 
 ## Installation
 
