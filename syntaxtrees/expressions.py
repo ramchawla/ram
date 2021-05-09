@@ -10,6 +10,7 @@ are expressly prohibited.
 This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
+x = 5
 try:
     from .abs import Expr
 except ImportError:
