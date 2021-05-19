@@ -183,3 +183,6 @@ class InputText(Expr):
     def evaluate(self, env: dict[str, Any]) -> Optional[Any]:
         """ Evaluate an input expression. """
         return input('')
+
+    def __str__(self) -> str:
+        return 'input()'

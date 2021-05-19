@@ -162,4 +162,4 @@ class BoolEq(Expr):
 
     def __str__(self) -> str:
         """Return a string representation of this boolean expression."""
-        return str(self.value1) + ' is ' + str(self.value2)
+        return str(self.value1) + ' == ' + str(self.value2)

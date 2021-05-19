@@ -3,7 +3,7 @@
 
 % Example of a function with no return
 new function equals takes (x,y) {
-    if (x) is (y) {
+    if x is y {
         set boolean result to true
     } else {
         set boolean result to false
@@ -18,11 +18,19 @@ new function compute takes (number) {
     % initialise variable z
     set integer z to 0
 
-    loop with i from (1) to (number) {
+    loop with i from 1 to number {
         reset integer z to i
     }
 
     send back z
+}
+
+
+new function receive_number takes (none) {
+    % simplify input expression
+    set text message to "Enter a number: "
+    set text convert to GET_TEXT[m=message]
+    send back CONVERT_NUMBER[arg=convert]
 }
 
 
@@ -51,8 +59,10 @@ new function sum_numbers takes (starting_number) {
 new function main takes (none) {
     % get user input for two values
     display "Enter two values to compare: "
-    set integer result_one to compute[number=GET_NUMBER]
-    set integer result_two to compute[number=GET_NUMBER]
+    % set integer result_one to compute[number=GET_NUMBER]
+    % set integer result_two to compute[number=GET_NUMBER]
+    set integer result_one to receive_number[none=0]
+    set integer result_two to receive_number[none=0]
 
     % check if the results are equal
     if equals[x=result_one,y=result_two] {

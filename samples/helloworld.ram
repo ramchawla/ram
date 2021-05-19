@@ -2,3 +2,8 @@
 
 set text hello to "Hello World!"
 display hello
+
+
+loop with x from 1 to 4 {
+    display x
+}

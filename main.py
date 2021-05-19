@@ -25,7 +25,9 @@ def main() -> None:
 
     # parse the file and evaluate the module
     module = process.main_parser(file_path)
-    module.evaluate()
+    print(module)
+
+    # module.evaluate()
 
 
 if __name__ == '__main__':

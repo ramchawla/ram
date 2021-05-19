@@ -11,6 +11,7 @@ This file is Copyright (c) 2021 Will Assad, Zain Lakhani,
 Ariel Chouminov, Ramya Chawla.
 """
 import verify
+
 try:
     from .abs import Expr, Statement
 except ImportError:
@@ -89,7 +90,7 @@ class Display(Statement):
 
     def __str__(self) -> str:
         """String representation of display"""
-        return f'display {str(self.argument)}'
+        return f'print({str(self.argument)})'
 
 
 class If(Statement):
@@ -161,19 +162,19 @@ class If(Statement):
         """ Return string of If """
         str_so_far = 'if %s: \n' % str(self.evals[0][0])
         for statement in self.evals[0][1]:
-            str_so_far += '    %s\n' % str(statement)
+            str_so_far += '    %s\n' % str(statement).replace('\n', '\n    ')
 
         for ev in self.evals[1:]:
-            str_so_far += 'else if %s: \n' % str(ev[0])
+            str_so_far += 'elif %s: \n' % str(ev[0])
             for statement in ev[1]:
-                str_so_far += '    %s\n' % str(statement)
+                str_so_far += '    %s\n' % str(statement).replace('\n', '\n    ')
 
         if self.orelse == []:
             return str_so_far
 
         str_so_far += 'else:\n'
         for statement in self.orelse:
-            str_so_far += '    %s\n' % str(statement)
+            str_so_far += '    %s\n' % str(statement).replace('\n', '\n    ')
 
         return str_so_far
 
@@ -247,9 +248,14 @@ class Loop(Statement):
 
     def __str__(self) -> str:
         """ String representation of a loop. """
-        str_so_far = f'loop with {str(self.target)} from {str(self.start)} to {str(self.stop)}:\n'
+        str_so_far = f'for %s in range(round(%s), round(%s) + 1):\n' % (
+            str(self.target), str(self.start), str(self.stop))
         for statement in self.body:
-            str_so_far += f'    {str(statement)}\n'
+            if isinstance(statement, list):
+                if len(statement) > 0:
+                    str_so_far += '    ' + str(statement[0]).replace('\n', '\n    ') + '\n'
+            else:
+                str_so_far += '    ' + str(statement).replace('\n', '\n    ') + '\n'
 
         return str_so_far
 
@@ -308,3 +314,11 @@ class Function(Statement):
         """Evaluate a function assignment. """
         # add function reference to environment
         env[self.name] = self.call
+
+    def __str__(self) -> str:
+        func_str = 'def %s(%s): \n' % (self.name, ', '.join(self.params))
+        for statement in self.body:
+            func_str += '    ' + str(statement).replace('\n', '\n    ') + '\n'
+
+        func_str += '    return ' + str(self.rturn)
+        return func_str

@@ -146,7 +146,5 @@ def get_expression_single_value(value: str) -> Expr:
         return Name(value[:value.index('[')], param_dict)
     elif value == 'GET_NUMBER':
         return InputNumber(lexify, parse_expression)
-    elif value == 'GET_TEXT':
-        return InputText()
     else:
         return Name(value)

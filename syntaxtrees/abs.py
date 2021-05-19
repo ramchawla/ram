@@ -44,6 +44,9 @@ class EmptyExpr(Expr):
         """
         return None
 
+    def __str__(self) -> str:
+        return 'None'
+
 
 class Module:
     """A class representing a full program.
@@ -60,6 +63,33 @@ class Module:
     def evaluate(self) -> None:
         """Evaluate this module.
         """
-        env = {}
+        env = {'CONVERT_NUMBER': builtin_convert_to_number, 'GET_TEXT': builtin_get_text}
         for statement in self.body:
             statement.evaluate(env)
+
+    def __str__(self) -> str:
+        """ A python representation of the module. """
+        ms_str = ''
+        for statement in self.body:
+            ms_str += str(statement) + '\n'
+
+        return ms_str
+
+
+def builtin_convert_to_number(params: dict[str, Expr], local_env: dict[str, Expr]) -> float:
+    """
+    """
+    arguments = {arg_name: params[arg_name].evaluate(local_env) for arg_name in params}
+    arguments.update(local_env)
+
+    candidate = list(params.values())[0].evaluate(local_env)
+    return float(candidate)
+
+
+def builtin_get_text(params: dict[str, Expr], local_env: dict[str, Expr]) -> str:
+    """
+    """
+    arguments = {arg_name: params[arg_name].evaluate(local_env) for arg_name in params}
+    arguments.update(local_env)
+
+    return input(list(params.values())[0].evaluate(local_env))
